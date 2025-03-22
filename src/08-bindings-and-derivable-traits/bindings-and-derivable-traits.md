@@ -1,40 +1,40 @@
-# Bindings and derivable traits
+# バインディングと導出可能なトレイト
 
-We've encountered several traits that shouldn't be implemented manually, but derived. These traits express connections between types in Rust and Julia and their properties.
+手動で実装すべきではなく、導出すべきいくつかのトレイトに出会いました。これらのトレイトは、RustとJuliaの型間の接続とその特性を表現します。
 
-The following traits can currently be derived:
+現在、以下のトレイトが導出可能です：
 
 - `ValidLayout`
-  Expresses that the implementor represents the layout of one or more Julia types, i.e. it's a layout type.
+  実装者が1つ以上のJulia型のレイアウトを表すことを示します。つまり、レイアウト型です。
 
 - `ValidField`
-  Expresses that the implementor represents the layout of one or more Julia types when used as a field of another type.
+  実装者が他の型のフィールドとして使用されるときに、1つ以上のJulia型のレイアウトを表すことを示します。
 
 - `IsBits`
-  Expresses that the implementor is the layout of an `isbits` type.
+  実装者が`isbits`型のレイアウトであることを示します。
 
 - `Typecheck`
-  Lets the implementor be used with `DataType::is` and `Value::is`, the implementation calls `ValidLayout::valid_layout`.
+  実装者を`DataType::is`および`Value::is`で使用できるようにし、実装は`ValidLayout::valid_layout`を呼び出します。
 
 - `IntoJulia`
-  Lets the implementor be converted to managed data with `Value::new`.
+  実装者を`Value::new`で管理されたデータに変換できるようにします。
 
 - `Unbox`
-  Lets the implementor be used as the target type of `Value::unbox`.
+  実装者を`Value::unbox`のターゲット型として使用できるようにします。
 
 - `ConstructType`
-  Lets the implementor be used as a type constructor.
+  実装者を型コンストラクタとして使用できるようにします。
 
 - `HasLayout`
-  Links a type constructor to its layout type.
+  型コンストラクタをそのレイアウト型にリンクします。
 
 - `CCallArg`
-  Lets the implementor be used as an argument type of a function called via `ccall`.
+  実装者を`ccall`を介して呼び出される関数の引数型として使用できるようにします。
 
 - `CCallReturn`
-  Lets the implementor be used as the return type of a function called via `ccall`.
+  実装者を`ccall`を介して呼び出される関数の戻り値型として使用できるようにします。
 
 - `Enum`
-  Maps the implementor to a Julia enum.
+  実装者をJuliaの列挙型にマッピングします。
 
-We can use JlrsCore.jl to generate bindings to Julia types which derive these traits if applicable. These bindings provide an interface to existing Julia types, and can't be used to expose Rust types to Julia.
+適用可能な場合、JlrsCore.jlを使用してこれらのトレイトを導出するJulia型へのバインディングを生成できます。これらのバインディングは既存のJulia型へのインターフェースを提供し、Rust型をJuliaに公開するために使用することはできません。

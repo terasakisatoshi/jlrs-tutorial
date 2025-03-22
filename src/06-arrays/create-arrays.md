@@ -1,8 +1,8 @@
-# Creating arrays
+# 配列の作成
 
-Functions that create new arrays can mostly be divided into two classes: `Typed(Ranked)Array` provides functions like `new` which use the given `T` to construct the element type, while `(Ranked)Array` provides similar functions postfixed with `_for`, e.g. `new_for`, which take the element type as an argument instead.
+新しい配列を作成する関数は主に2つのクラスに分けられます。`Typed(Ranked)Array`は、与えられた`T`を使用して要素の型を構築する`new`のような関数を提供し、`(Ranked)Array`は、要素の型を引数として取る`new_for`のような後置された関数を提供します。
 
-In addition to the element type, these functions take the desired dimensions of the array as an argument. Up to rank 4, tuples of `usize` can be used to express these dimensions. It's also possible to use `[usize; N]`, `&[usize; N]`, and `&[usize]`. If the rank of the array and the dimensions are known at compile time and they don't match, the code will fail to compile.
+これらの関数は、要素の型に加えて、配列の希望する次元を引数として取ります。ランク4まで、`usize`のタプルを使用してこれらの次元を表現できます。また、`[usize; N]`、`&[usize; N]`、`&[usize]`を使用することも可能です。配列のランクと次元がコンパイル時に既知であり、それらが一致しない場合、コードはコンパイルに失敗します。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -24,9 +24,9 @@ fn main() {
 }
 ```
 
-The `new(_for)` functions return an array whose elements haven't been initialized.[^1] It's also possible to wrap an existing `Vec` or slice with `from_vec(_for)` and `from_slice(_for)`. These functions require that the elements are laid out correctly for an array whose element type is `T`. If the layout of the elements is `U`, this layout must be correct for `T`. This connection is expressed with the `HasLayout` trait, which connects a type constructor with its layout type. They're the same type as long as no type parameters have been elided.
+`new(_for)`関数は、要素が初期化されていない配列を返します[^1]。既存の`Vec`やスライスを`from_vec(_for)`や`from_slice(_for)`でラップすることも可能です。これらの関数は、要素が`T`型の配列に対して正しく配置されていることを要求します。要素のレイアウトが`U`の場合、このレイアウトは`T`に対して正しいものでなければなりません。この接続は、型コンストラクタとそのレイアウト型を接続する`HasLayout`トレイトで表現されます。型パラメータが省略されていない限り、これらは同じ型です。
 
-The `from_vec(_for)` functions take ownership of a `Vec`, which is dropped when the array is freed by the GC. The `from_slice(_for)` functions borrow their data from Rust instead. `Value` and `Array` have a second lifetime called `'data`. This lifetime is set to the lifetime of the borrow to prevent this array from being accessed after the borrow ends. Be aware that Julia is unaware of this lifetime, so there's nothing that prevents us from keeping the array alive by assigning it to a global variable or sending it to some background thread. It's your responsibility to guarantee this doesn't happen, which is one of the reasons why the methods to call Julia functions are unsafe.
+`from_vec(_for)`関数は`Vec`の所有権を取得し、配列がGCによって解放されるときにドロップされます。`from_slice(_for)`関数は、代わりにRustからデータを借用します。`Value`と`Array`は、`'data`と呼ばれる第2のライフタイムを持っています。このライフタイムは、借用が終了した後にこの配列にアクセスされないように、借用のライフタイムに設定されます。Juliaはこのライフタイムを認識していないため、配列をグローバル変数に割り当てたり、バックグラウンドスレッドに送信したりして配列を生かし続けることを防ぐものはありません。これが起こらないことを保証するのはあなたの責任であり、これがJulia関数を呼び出すメソッドがunsafeである理由の一つです。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -68,7 +68,7 @@ fn main() {
 }
 ```
 
-The functions `from_slice_cloned(_for)` and `from_slice_copied(_for)` use `new(_for)` to allocate the array, then clone or copy the elements from a given slice to this array. These functions avoid the finalizer of `from_vec(_for)` and the lifetime limitations of `from_slice(_for)`, at the cost of cloning or copying the elements.
+`from_slice_cloned(_for)`と`from_slice_copied(_for)`関数は、`new(_for)`を使用して配列を割り当て、指定されたスライスからこの配列に要素をクローンまたはコピーします。これらの関数は、`from_vec(_for)`のファイナライザと`from_slice(_for)`のライフタイム制限を回避しますが、要素をクローンまたはコピーするコストがかかります。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -108,7 +108,7 @@ fn main() {
 }
 ```
 
-Finally, there are two specialized functions. `TypedVector::<Any>::new_any` allocates a vector that can hold elements of any type. `TypedVector::<u8>::from_bytes` can convert anything that can be referenced as a slice of bytes to a `TypedVector<u8>`, it's similar to `TypedVector::<u8>::from_slice_copied`.
+最後に、2つの特殊な関数があります。`TypedVector::<Any>::new_any` は任意の型の要素を保持できるベクターを割り当てます。`TypedVector::<u8>::from_bytes` は、バイトのスライスとして参照できるものを `TypedVector<u8>` に変換できます。これは `TypedVector::<u8>::from_slice_copied` に似ています。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -133,4 +133,4 @@ fn main() {
 }
 ```
 
-[^1]: If the elements reference other managed data, the array storage will be initialized to 0.
+[^1]: 要素が他の管理されたデータを参照している場合、配列ストレージは0に初期化されます。

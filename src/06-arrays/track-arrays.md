@@ -1,8 +1,8 @@
-# Tracking arrays
+# 配列の追跡
 
-It's trivial to create multiple mutable accessors to the same array. A band-aid is available: jlrs can track managed data to prevent mutable aliasing in Rust code to a degree. An array can be tracked exclusively or shared with the `track_exclusive` and `track_shared` methods available to all array types. `track_shared` succeeds as long as the array isn't already tracked exclusively, `track_exclusive` enforces exclusive access.
+同じ配列に対して複数の可変アクセサを作成するのは簡単です。応急処置として、jlrs は Rust コード内での可変エイリアスをある程度防ぐために管理されたデータを追跡することができます。配列は、すべての配列型で利用可能な `track_exclusive` と `track_shared` メソッドを使用して、排他的または共有で追跡することができます。`track_shared` は配列がすでに排他的に追跡されていない限り成功し、`track_exclusive` は排他的アクセスを強制します。
 
-Overall, tracking can make accessing arrays safer as long as it's used consistently, but it's unaware of accesses in Julia code.
+全体として、追跡を一貫して使用する限り、配列へのアクセスをより安全にすることができますが、Julia コード内でのアクセスについては認識していません。
 
 ```rust,ignore
 use jlrs::prelude::*;

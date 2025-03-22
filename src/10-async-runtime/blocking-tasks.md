@@ -1,6 +1,6 @@
-# Blocking tasks
+# ブロッキングタスク
 
-Blocking tasks are the simplest kind of task, they're closures that take a `GcFrame` which are sent to the runtime thread and executed in a dynamic scope. As their name implies, when a blocking task is executed the runtime thread is blocked until the task has completed.
+ブロッキングタスクは最も単純な種類のタスクであり、`GcFrame` を受け取るクロージャです。これらはランタイムスレッドに送信され、動的スコープで実行されます。その名前が示すように、ブロッキングタスクが実行されると、タスクが完了するまでランタイムスレッドはブロックされます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -31,6 +31,6 @@ fn main() {
 }
 ```
 
-Sending a task is a two-step process. The `AsyncHandle::blocking_task` method returns an instance of `Dispatch`, which provides sync and async methods to dispatch the task. If the backing channel is full, `Dispatch::try_dispatch` fails but returns itself as an `Err` to allow retrying later.
+タスクを送信するには2段階のプロセスがあります。`AsyncHandle::blocking_task` メソッドは `Dispatch` のインスタンスを返し、タスクをディスパッチするための同期および非同期メソッドを提供します。バックチャネルがいっぱいの場合、`Dispatch::try_dispatch` は失敗しますが、再試行を可能にするために `Err` として自身を返します。
 
-If the task has been dispatched successfully, the receiving half of tokio's oneshot-channel is returned which will eventually receive the result of that task.
+タスクが正常にディスパッチされた場合、最終的にそのタスクの結果を受け取る tokio のワンショットチャネルの受信側が返されます。

@@ -1,7 +1,7 @@
-# Union fields
+# Unionフィールド
 
-The representation of a field with a `Union` type depends on the union's variants. If all variants are `isbits` types an optimization applies and the field is inlined, otherwise the field is represented as `Option<ValueRef>`. We'll see later that a similar optimization applies to arrays.
+`Union`型のフィールドの表現は、そのユニオンのバリアントに依存します。すべてのバリアントが`isbits`型である場合、最適化が適用され、フィールドはインライン化されます。それ以外の場合、フィールドは`Option<ValueRef>`として表現されます。後で、配列にも同様の最適化が適用されることを見ていきます。
 
-The presence of a union field doesn't affect whether the layout type can implement `ValidLayout`, `ValidField`, and `ConstructType`.
+ユニオンフィールドの存在は、レイアウトタイプが`ValidLayout`、`ValidField`、および`ConstructType`を実装できるかどうかには影響しません。
 
-It's not particularly important to know how an inlined union can be represented in Rust, so no example will be provided.
+インライン化されたユニオンがRustでどのように表現されるかを知ることは特に重要ではないため、例は提供されません。

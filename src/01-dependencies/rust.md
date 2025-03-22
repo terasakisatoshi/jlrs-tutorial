@@ -1,7 +1,7 @@
 # Rust
 
-The minimum supported Rust version (MSRV) is currently 1.77, but some features may require a more recent version. The MSRV can be bumped in minor releases of jlrs.[^1]
+サポートされている最小のRustバージョン（MSRV）は現在1.77ですが、一部の機能にはより新しいバージョンが必要な場合があります。MSRVはjlrsのマイナーリリースで引き上げられることがあります。[^1]
 
-Note for Windows users: only the GNU toolchain is supported for dynamic libraries, applications that embed Julia can use either the GNU or MSVC toolchain.
+Windowsユーザーへの注意: 動的ライブラリにはGNUツールチェーンのみがサポートされていますが、Juliaを埋め込むアプリケーションはGNUまたはMSVCツールチェーンのどちらも使用できます。
 
-[^1]: The informal policy is that the MSRV must not exceed the version used by Yggdrasil.
+[^1]: 非公式の方針として、MSRVはYggdrasilで使用されているバージョンを超えてはなりません。

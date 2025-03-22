@@ -1,6 +1,6 @@
-# Inline and non-inline layouts
+# インラインと非インラインのレイアウト
 
-In the previous section we saw that fields with an `isbits` type are inlined in a composite type. A field whose type is mutable won't be inlined.
+前のセクションでは、`isbits` 型のフィールドがコンポジット型にインライン化されることを見ました。型が可変のフィールドはインライン化されません。
 
 ```julia
 mutable struct Inner
@@ -26,8 +26,8 @@ struct Outer<'scope, 'data> {
 }
 ```
 
-An unrooted reference is used instead of a managed type to represent non-inlined fields to account for mutability, which can render the field's old value unreachable. Managed types and unrooted references make use of the `Option<NonNull>` niche optimization to guarantee `Option<ValueRef>` has the same size as a pointer.[^1] We'll say that instances of `Outer` reference managed data.
+非インラインフィールドを表現するために、管理された型の代わりに非ルート参照が使用されます。これは、フィールドの古い値が到達不能になる可能性があるためです。管理された型と非ルート参照は、`Option<NonNull>` のニッチ最適化を利用して、`Option<ValueRef>` がポインタと同じサイズであることを保証します。`Outer` のインスタンスが管理されたデータを参照することを言います。
 
-Because mutable types aren't inlined, `Inner` can only implement `ValidLayout`, not `ValidField`. Immutable types are normally inlined, so `Outer` can implement both traits. The layouts identify single types, so both types can implement `ConstructType`.
+可変型はインライン化されないため、`Inner` は `ValidLayout` のみを実装でき、`ValidField` は実装できません。通常、イミュータブル型はインライン化されるため、`Outer` は両方のトレイトを実装できます。レイアウトは単一の型を識別するため、両方の型が `ConstructType` を実装できます。
 
-[^1]: Null data is rare in Julia and generally invalid to use.
+[^1]: Julia ではヌルデータは稀であり、一般的に使用することは無効です。

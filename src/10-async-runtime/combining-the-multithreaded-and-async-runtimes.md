@@ -1,8 +1,8 @@
-# Combining the multithreaded and async runtimes
+# マルチスレッドと非同期ランタイムの組み合わせ
 
-It's possible to combine the functionality of the multithreaded and async runtimes.
+マルチスレッドと非同期ランタイムの機能を組み合わせることが可能です。
 
-The `AsyncBuilder` provides `start_mt` and `spawn_mt` methods that let us use both an `MtHandle` and an `AsyncHandle` when both the `async-rt` and `multi-rt` features have been enabled. The  `AsyncHandle` lets us send tasks to the main runtime thread, which is useful if we have some code that we must be called from that thread.
+`AsyncBuilder` は `start_mt` と `spawn_mt` メソッドを提供しており、`async-rt` と `multi-rt` の両方の機能が有効になっている場合に `MtHandle` と `AsyncHandle` の両方を使用できます。`AsyncHandle` は、メインランタイムスレッドから呼び出す必要があるコードがある場合に、そのスレッドにタスクを送信するのに役立ちます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -20,9 +20,9 @@ fn main() {
 }
 ```
 
-We can also create thread pools where each worker thread can call into Julia and runs an async runtime.[^1] We can configure and create new pools with `MtHandle::pool_builder`. When a pool is spawned, an `AsyncHandle` to the pool is returned. Taslks are sent to this pool instead of a specific thread, it can be handled by any of its workers. If a worker dies due to a panic a new worker is automatically spawned.[^2]
+各ワーカースレッドがJuliaに呼び出し、非同期ランタイムを実行できるスレッドプールを作成することもできます[^1]。`MtHandle::pool_builder` を使用して新しいプールを設定および作成できます。プールが生成されると、そのプールへの `AsyncHandle` が返されます。タスクは特定のスレッドではなくこのプールに送信され、ワーカーのいずれかによって処理されます。ワーカーがパニックで終了した場合、新しいワーカーが自動的に生成されます[^2]。
 
-Workers can be dynamically added and removed with `AsyncHandle::try_add_worker` and `AsyncHandle::try_remove_worker`. The pool shuts down when all workers have been removed, all handles have been dropped, or if its closed explicitly. It's not possible to add workers to the async runtime itself, only to pools.
+ワーカーは `AsyncHandle::try_add_worker` と `AsyncHandle::try_remove_worker` を使用して動的に追加および削除できます。すべてのワーカーが削除され、すべてのハンドルが破棄されるか、明示的に閉じられるとプールはシャットダウンします。非同期ランタイム自体にワーカーを追加することはできず、プールにのみ追加できます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -47,8 +47,8 @@ fn main() {
 }
 ```
 
-One additional advantage that pools have over the async runtime thread is that the latency is typically much lower. If we don't need code to run on the main thread specifically, it's more effective to use the multithreaded runtime and create a pool instead.
+プールが非同期ランタイムスレッドよりも持つ追加の利点の一つは、通常レイテンシーがはるかに低いことです。特にメインスレッドでコードを実行する必要がない場合は、マルチスレッドランタイムを使用してプールを作成する方が効果的です。
 
-[^1]: More precisely, not an async runtime but an instance of an executor.
+[^1]: より正確には、非同期ランタイムではなく、エグゼキュータのインスタンスです。
 
-[^2]: While it's still recommended to abort on panics, it's safe to panic on a worker thread as long as we don't unwind into Julia code by panicking in a function called with `ccall`.
+[^2]: パニック時には中止することが推奨されますが、`ccall` で呼び出された関数内でパニックすることでJuliaコードに巻き戻さない限り、ワーカースレッドでパニックしても安全です。

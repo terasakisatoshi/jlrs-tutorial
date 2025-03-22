@@ -1,14 +1,14 @@
-# Testing libraries
+# ライブラリのテスト
 
-Testing a dynamic library is mostly a matter of embedding Julia in the testing application, but there are a few things to keep in mind.
+動的ライブラリをテストするには、主にテストアプリケーションにJuliaを埋め込む必要がありますが、いくつか注意点があります。
 
-- To embed Julia we have to enable a runtime feature, but such a feature must not be enabled for library crates under normal circumstances.
-- To compile integration tests, we must build an `rlib`.
-- We have to call the generated init-function before calling functions that our library exports to Julia.
-- We can only call exported functions, not the generated `extern "C"` functions that would have been called from Julia.
-- Testing requires unwinding on panics, and we normally want to abort.
+- Juliaを埋め込むにはランタイム機能を有効にする必要がありますが、通常の状況ではライブラリクレートにそのような機能を有効にしてはいけません。
+- 統合テストをコンパイルするには、`rlib`をビルドする必要があります。
+- ライブラリがJuliaにエクスポートする関数を呼び出す前に、生成された初期化関数を呼び出す必要があります。
+- エクスポートされた関数のみを呼び出すことができ、Juliaから呼び出される生成された`extern "C"`関数を呼び出すことはできません。
+- テストにはパニック時のアンワインドが必要であり、通常は中止したいと考えます。
 
-To deal with the first two limitations we need to edit our `Cargo.toml` a bit.
+最初の2つの制限に対処するために、`Cargo.toml`を少し編集する必要があります。
 
 ```toml
 [lib]
@@ -18,9 +18,9 @@ crate-type = ["cdylib", "rlib"]
 rt = ["jlrs/local-rt"] # Or any other runtime feature
 ```
 
-The `rt` feature must not be enabled by default, we must only enable it when we test our code: `cargo test --features rt`. As always, the limitation that Julia can only be initialized once per process applies. Each integration test file in the tests directory must only contain a single test that initializes Julia and calls the generated init function. Our crate can similarly use just one test function that initializes Julia, so it's easiest to stick with integration tests.
+`rt`機能はデフォルトで有効にしてはいけません。コードをテストする際にのみ有効にする必要があります：`cargo test --features rt`。いつものように、Juliaはプロセスごとに一度しか初期化できないという制限が適用されます。テストディレクトリ内の各統合テストファイルには、Juliaを初期化し、生成された初期化関数を呼び出す単一のテストのみを含める必要があります。クレートも同様に、Juliaを初期化する1つのテスト関数を使用できるため、統合テストを使用するのが最も簡単です。
 
-Let's test the following library:
+次のライブラリをテストしてみましょう：
 
 ```rust,ignore
 use jlrs::{
@@ -67,7 +67,7 @@ julia_module! {
 }
 ```
 
-We'll call our library `testing_libraries_tutorial`. We can test it as follows:
+ライブラリを`testing_libraries_tutorial`と呼びます。次のようにテストできます：
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -126,4 +126,4 @@ fn it_works() {
 }
 ```
 
-We can see in these tests that we can track a `TypedValue` to acquire a reference to its internal data, which lets us call the type's methods. This matches the behavior of the generated `extern "C"` functions when they haven't been annotated with `#[untracked_self]`. If this annotation is present and we want to avoid tracking, we can access the internal pointer of a `Value` directly with `Value::data_ptr` and dereferencing it accordingly.
+これらのテストでは、`TypedValue`を追跡して内部データへの参照を取得し、型のメソッドを呼び出すことができることがわかります。これは、`#[untracked_self]`で注釈されていない場合の生成された`extern "C"`関数の動作と一致します。この注釈が存在し、追跡を避けたい場合は、`Value`の内部ポインタに直接アクセスし、`Value::data_ptr`を使用して適切にデリファレンスすることができます。

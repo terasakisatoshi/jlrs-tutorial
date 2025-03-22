@@ -1,6 +1,6 @@
-# Async runtime
+# 非同期ランタイム
 
-The async runtime lets us run Julia on a background thread, its handle lets us send tasks to this thread. We need to enable the `async-rt` feature to use it. Some tasks support async operations, so we'll also need an async executor. A tokio-based executor is available when the `tokio-rt` feature is enabled, this feature automatically enables `async-rt` as well.
+非同期ランタイムを使用すると、Juliaをバックグラウンドスレッドで実行できます。そのハンドルを使って、このスレッドにタスクを送信できます。これを使用するには、`async-rt`機能を有効にする必要があります。一部のタスクは非同期操作をサポートしているため、非同期エグゼキュータも必要です。`tokio-rt`機能を有効にすると、tokioベースのエグゼキュータが利用可能になり、この機能は自動的に`async-rt`も有効にします。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -17,12 +17,12 @@ fn main() {
 }
 ```
 
-We've configured Julia to use 4 threads.[^1] The builder is upgraded to an `AsyncBuilder` by providing it with the necessary configuration. Here we've configure the runtime to use the tokio-based executor without the I/O driver, and to support 3 concurrent tasks.[^2] If you want to use this driver, enable the `tokio-net` feature and change the argument of `Tokio::new` to `true`.
+Juliaを4つのスレッドで使用するように設定しました[^1]。ビルダーは必要な設定を提供することで`AsyncBuilder`にアップグレードされます。ここでは、I/Oドライバなしでtokioベースのエグゼキュータを使用し、3つの同時タスクをサポートするようにランタイムを設定しています[^2]。このドライバを使用したい場合は、`tokio-net`機能を有効にし、`Tokio::new`の引数を`true`に変更してください。
 
-By default, an unbounded channel is used to let the handles communicate with the runtime thread. A bounded channel can be used by calling `AsyncBuilder::channel_capacity` before spawning the runtime.
+デフォルトでは、ハンドルがランタイムスレッドと通信するために無制限のチャネルが使用されます。ランタイムを生成する前に`AsyncBuilder::channel_capacity`を呼び出すことで、制限付きチャネルを使用することもできます。
 
-After spawning the runtime, we get an `AsyncHandle` that we can use to interact with the runtime thread and a `JoinHandle` to that thread. The runtime thread shuts down when all `AsyncHandle`s have been dropped. It's also possible to manually shut down the runtime by calling `AsyncHandle::close`.
+ランタイムを生成した後、ランタイムスレッドと対話するために使用できる`AsyncHandle`と、そのスレッドへの`JoinHandle`を取得します。すべての`AsyncHandle`がドロップされると、ランタイムスレッドはシャットダウンします。また、`AsyncHandle::close`を呼び出すことで手動でランタイムをシャットダウンすることも可能です。
 
-[^1]: Since Julia 1.9 these threads belong to Julia's default thread pool, we can also configure the number of interactive threads with `(Async)Builder::n_interactive_threads`.
+[^1]: Julia 1.9以降、これらのスレッドはJuliaのデフォルトスレッドプールに属しており、`(Async)Builder::n_interactive_threads`でインタラクティブスレッドの数を設定することもできます。
 
-[^2]: Multiple tasks that support async operations can be executed concurrently, the runtime can switch to another task while waiting for an async operation to complete. Tasks are not executed in parallel, all tasks are executed on the single runtime thread.
+[^2]: 非同期操作をサポートする複数のタスクを同時に実行できます。ランタイムは非同期操作の完了を待っている間に別のタスクに切り替えることができます。タスクは並行して実行されるのではなく、すべてのタスクが単一のランタイムスレッドで実行されます。

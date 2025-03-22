@@ -1,12 +1,12 @@
-# Mutating arrays
+# 配列の変更
 
-In addition to the immutable accessors we've seen in the previous section, jlrs also provides mutable accessors.
+前のセクションで見た不変のアクセサに加えて、jlrsは可変のアクセサも提供します。
 
-Methods like `(try_)bits_data_mut` and types like `BitsAccessorMut` exist analogously to the immutable variants. The methods provided by the mutable accessors have names similar to their immutable counterparts. Some accessors don't provide direct mutable access to an element; they don't implement `IndexMut` or provide a `set_mut` method. In this case we'll need to use `AccessorMut::set_value`.
+`(try_)bits_data_mut`のようなメソッドや`BitsAccessorMut`のような型は、不変のバリアントに類似して存在します。可変アクセサによって提供されるメソッドは、不変の対応メソッドと似た名前を持っています。一部のアクセサは要素への直接的な可変アクセスを提供しません。それらは`IndexMut`を実装していないか、`set_mut`メソッドを提供していません。この場合、`AccessorMut::set_value`を使用する必要があります。
 
-Mutating managed data from Rust is generally unsafe in jlrs. The reason essentially boils down to "just because you have access to a mutable value doesn't mean you're allowed to mutate it." Strings are a good example, they're mutable but it's UB to mutate them. Array accessors are a bit special in this regard: it's unsafe to create a mutable accessor, but many of their mutating methods are safe. The safety-requirements are implied by the requirements of creating a mutable accessor in the first place.
+Rustから管理されたデータを変更することは、jlrsでは一般的に安全ではありません。その理由は本質的に、「可変な値にアクセスできるからといって、それを変更することが許可されているわけではない」ということに帰着します。文字列は良い例で、可変ですがそれを変更することは未定義動作（UB）です。配列アクセサはこの点で少し特別です：可変アクセサを作成することは安全ではありませんが、それらの多くの変更メソッドは安全です。安全性の要件は、そもそも可変アクセサを作成する際の要件によって暗示されています。
 
-The array types implement `Copy` so it's trivial to create two mutable accessors to the same array, or multiple mutable and immutable accessor in general. It's your responsibility to ensure this doesn't happen. It's possible to avoid this issue to a degree by tracking the array, which we'll cover later in this chapter.
+配列型は`Copy`を実装しているため、同じ配列に対して2つの可変アクセサや、一般的に複数の可変および不変アクセサを作成することは簡単です。これが起こらないようにするのはあなたの責任です。この問題をある程度回避するために、配列を追跡することが可能であり、この章の後半でそれについて説明します。
 
 ```rust,ignore
 use jlrs::prelude::*;

@@ -1,8 +1,8 @@
-# Multithreaded runtime
+# マルチスレッドランタイム
 
-In all examples so far we've used the local runtime, which is limited to a single thread. The multithreaded runtime can be used from any thread, this feature requires using at least Julia 1.9 and enabling the `multi-rt` feature.
+これまでの例では、単一スレッドに制限されたローカルランタイムを使用してきました。マルチスレッドランタイムは任意のスレッドから使用でき、この機能を利用するには少なくともJulia 1.9を使用し、`multi-rt`機能を有効にする必要があります。
 
-Using the multithreaded runtime instead of the local runtime is mostly a matter of starting the runtime differently.
+ローカルランタイムの代わりにマルチスレッドランタイムを使用するには、主にランタイムの開始方法を変更するだけです。
 
 ```rust,ignore
 use std::thread;
@@ -39,9 +39,9 @@ fn main() {
 }
 ```
 
-Julia is initialized on a background thread when `spawn_mt` is called. This method returns an `MtHandle` that we can use to call into Julia and a handle to the runtime thread. The `MtHandle` can be cloned and sent to other threads, by calling `MtHandle::with` the thread is temporarily put into a state where it can create scopes and call into Julia. The runtime thread shuts down when all `MtHandle`s have been dropped.
+`spawn_mt`が呼び出されると、Juliaはバックグラウンドスレッドで初期化されます。このメソッドは、Juliaを呼び出すために使用できる`MtHandle`とランタイムスレッドへのハンドルを返します。`MtHandle`はクローン化して他のスレッドに送信することができ、`MtHandle::with`を呼び出すことで、そのスレッドは一時的にスコープを作成し、Juliaを呼び出すことができる状態になります。すべての`MtHandle`がドロップされると、ランタイムスレッドはシャットダウンします。
 
-Instead of spawning the runtime thread, we can also initialize Julia on the current thread and spawn a new thread that can use an `MtHandle`:
+ランタイムスレッドを生成する代わりに、現在のスレッドでJuliaを初期化し、`MtHandle`を使用できる新しいスレッドを生成することもできます。
 
 ```rust,ignore
 use std::thread;
@@ -83,4 +83,4 @@ fn main() {
 }
 ```
 
-This is useful if we interact with code in Julia that is picky about being called from the main application thread, e.g. code involving Qt.
+これは、Qtを含むコードのように、メインアプリケーションスレッドから呼び出されることにこだわるJuliaのコードとやり取りする場合に便利です。

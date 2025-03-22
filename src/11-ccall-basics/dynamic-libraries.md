@@ -1,14 +1,14 @@
-# Dynamic library
+# 動的ライブラリ
 
-The embedding example is rather contrived, we rarely need to expose a function from an application that embeds Julia. It's much more likely that some Rust crate implements useful functionality that we want to expose to Julia.
+埋め込みの例はかなり作為的ですが、Juliaを埋め込むアプリケーションから関数を公開する必要があることはほとんどありません。むしろ、Rustのクレートが有用な機能を実装しており、それをJuliaに公開したいというケースの方が多いでしょう。
 
-Julia can load dynamic libraries at runtime.[^1] Let's create a new dynamic library that exposes the `add` function we've defined above. We start by creating a new crate.[^2]
+Juliaは実行時に動的ライブラリをロードできます。[^1] ここでは、先ほど定義した`add`関数を公開する新しい動的ライブラリを作成します。まず、新しいクレートを作成します。[^2]
 
 ```bash
 cargo new julia_lib --lib
 ```
 
-We need to change the crate type to `cdylib`, this can be configured in `Cargo.toml`:
+クレートタイプを`cdylib`に変更する必要があります。これは`Cargo.toml`で設定できます。
 
 ```toml
 [package]
@@ -28,9 +28,9 @@ crate-type = ["cdylib"]
 [dependencies]
 ```
 
-We don't need to add jlrs as a dependency, we'll discuss the advantages and disadvantages of using jlrs with dynamic libraries in the next chapter.
+jlrsを依存関係として追加する必要はありません。動的ライブラリでjlrsを使用する利点と欠点については次の章で説明します。
 
-Replace the content of `lib.rs` with the following code:
+`lib.rs`の内容を次のコードに置き換えます。
 
 ```rust,ignore
 #[no_mangle]
@@ -39,9 +39,9 @@ pub unsafe extern "C" fn add(a: f64, b: f64) -> f64 {
 }
 ```
 
-The function is annotated with `#[no_mangle]` to prevent the name from being mangled. After building with `cargo build` we can find the library in `target/debug`. On Linux it will be named `libjulia_lib.so`, on macOS `libjulia_lib.dylib`, and on Windows `libjulia_lib.dll`. Let's use it!
+関数は`#[no_mangle]`で注釈されており、名前がマングルされないようにしています。`cargo build`でビルドした後、ライブラリは`target/debug`にあります。Linuxでは`libjulia_lib.so`、macOSでは`libjulia_lib.dylib`、Windowsでは`libjulia_lib.dll`という名前になります。さあ、使ってみましょう！
 
-Open the Julia REPL in `julia_lib`'s root directory and evaluate the following code:
+`julia_lib`のルートディレクトリでJulia REPLを開き、次のコードを評価します。
 
 ```julia
 julia> using Libdl
@@ -56,15 +56,15 @@ julia> ccall(func, Float64, (Float64, Float64), 1.0, 2.0)
 3.0
 ```
 
-Note that we don't have to provide the extension when opening the library.
+ライブラリを開く際に拡張子を指定する必要がないことに注意してください。
 
-If the library is on the library search path we don't even need to open it or acquire function pointers, but can refer to it directly:
+ライブラリがライブラリ検索パスにある場合、開いたり関数ポインタを取得したりする必要すらなく、直接参照できます。
 
 ```julia
 julia> ccall((:add, "libjulia_lib"), Float64, (Float64, Float64), 1.0, 2.0)
 3.0
 ```
 
-[^1]: Using the GNU toolchain is recommended on Windows. It might also be possible to use the MSVC toolchain but this hasn't been tested.
+[^1]: WindowsではGNUツールチェーンの使用が推奨されます。MSVCツールチェーンを使用することも可能かもしれませんが、これはテストされていません。
 
-[^2]: If the crate we want to expose already provides a C API we won't need an intermediate crate. We can directly build the library and adapt to the existing API instead.
+[^2]: 公開したいクレートがすでにC APIを提供している場合、中間クレートは必要ありません。ライブラリを直接ビルドし、既存のAPIに適応させることができます。

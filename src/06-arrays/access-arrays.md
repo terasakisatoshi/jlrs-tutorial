@@ -1,10 +1,10 @@
-# Accessing arrays
+# 配列へのアクセス
 
-The different array types don't provide direct access to their data, we'll need to create an accessor first. There are multiple accessor types, and the one that must be used depends on the layout of the elements.
+異なる配列型はデータへの直接アクセスを提供しないため、まずアクセサを作成する必要があります。アクセサには複数の種類があり、使用するべきものは要素のレイアウトに依存します。
 
-A quick note on safety: never access an array that's already accessed mutably, either in Rust or Julia code.
+安全性に関する注意点として、RustやJuliaのコードで既にミュータブルにアクセスされている配列には決してアクセスしないでください。
 
-It's possible to completely ignore the layout of the elements with an `IndeterminateAccessor`. It can be created with the `ArrayBase::indeterminate_data` method. It implements the `Accessor` trait which provides a `get_value` method which returns the element as a `Value`. Unlike Julia, array indexing starts at 0.
+要素のレイアウトを完全に無視するには、`IndeterminateAccessor`を使用することができます。これは`ArrayBase::indeterminate_data`メソッドで作成できます。`Accessor`トレイトを実装しており、`get_value`メソッドを提供し、要素を`Value`として返します。Juliaとは異なり、配列のインデックスは0から始まります。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -34,13 +34,13 @@ fn main() {
 }
 ```
 
-We've seen in the previous chapter that there are three ways a field of a composite type can be stored: it can be stored inline, as a reference to managed data, or as an inlined union. An array element is stored as if it were a field of a composite type with one minor exception, there's a difference between how inlined unions are stored in composite types and arrays.[^1]
+前の章で見たように、複合型のフィールドは3つの方法で格納される可能性があります：インラインで格納される、管理されたデータへの参照として格納される、またはインライン化されたユニオンとして格納される。配列要素は、複合型のフィールドとして格納されるかのように格納されますが、1つの小さな例外として、インライン化されたユニオンが複合型と配列で格納される方法に違いがあります[^1]。
 
-There's a separate accessor for each of these layouts: `InlineAccessor`, `ValueAccessor`, and `BitsUnionAccessor`. There are two additional accessors, `BitsAccessor` and `ManagedAccessor`. The first can be used with layouts that implement the `IsBits` trait and the latter with arbitrary managed types like `Module` and `DataType`.
+これらのレイアウトそれぞれに対して別々のアクセサがあります：`InlineAccessor`、`ValueAccessor`、`BitsUnionAccessor`。さらに2つのアクセサ、`BitsAccessor`と`ManagedAccessor`があります。最初のものは`IsBits`トレイトを実装するレイアウトで使用でき、後者は`Module`や`DataType`のような任意の管理された型で使用できます。
 
-If a `Typed(Ranked)Array` is used the correct accessor might be inferred from that type's `T` parameter. Some of these methods will be available in that case: `inline_data`, `value_data`, `union_data`, `bits_data`, and `managed_data`. Methods prefixed with `try_`, e.g. `try_bits_data`, are generally available for all array types. These methods check if the correct accessor has been requested at runtime. Methods like `ArrayBase::has_bits_layout` can be used to check if an accessor is compatible with the layout of the elements.
+`Typed(Ranked)Array`が使用される場合、その型の`T`パラメータから正しいアクセサが推測されるかもしれません。その場合、以下のメソッドが利用可能です：`inline_data`、`value_data`、`union_data`、`bits_data`、および`managed_data`。`try_`で始まるメソッド、例えば`try_bits_data`は、一般的にすべての配列型で利用可能です。これらのメソッドは、実行時に正しいアクセサが要求されたかどうかを確認します。`ArrayBase::has_bits_layout`のようなメソッドを使用して、アクセサが要素のレイアウトと互換性があるかどうかを確認できます。
 
-All these accessor types implement `Accessor`, and additionally provide a `get` function to access an element at some index. Excluding the `BitsUnionAccessor`, they also implement `Index`. These implementations accept the same multidimensional indices as the functions that create new arrays do. The `as_slice` and `into_slice` methods provided by the indexable types let us ignore the multidimensionality and access the data as a slice in column-major order.
+これらすべてのアクセサ型は`Accessor`を実装しており、さらに特定のインデックスで要素にアクセスするための`get`関数を提供します。`BitsUnionAccessor`を除いて、`Index`も実装しています。これらの実装は、新しい配列を作成する関数と同じ多次元インデックスを受け入れます。インデックス可能な型が提供する`as_slice`および`into_slice`メソッドを使用すると、多次元性を無視して、データを列優先順でスライスとしてアクセスできます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -136,4 +136,4 @@ fn main() {
 }
 ```
 
-[^1]: In composite types, the data and the tag that identifies its type are stored adjacently, in an array the flags are collectively stored after the data.
+[^1]: 複合型では、データとその型を識別するタグが隣接して保存されます。配列では、フラグはデータの後にまとめて保存されます。

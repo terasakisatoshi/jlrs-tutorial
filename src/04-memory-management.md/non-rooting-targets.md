@@ -1,7 +1,7 @@
-# Non-rooting targets
+# 非ルート化ターゲット
 
-We don't always need to root managed data. If we never use the result of a function, or if we can guarantee it's globally rooted, it's perfectly fine to leave it unrooted. Keeping unnecessary data alive only leads to additional GC overhead. In this case we want to use a non-rooting target.
+管理されたデータを常にルート化する必要はありません。関数の結果を使用しない場合や、それがグローバルにルート化されていることを保証できる場合は、ルート化しないままで問題ありません。不必要なデータを生かしておくと、追加のGCオーバーヘッドが発生するだけです。この場合、非ルート化ターゲットを使用したいです。
 
-Any target can be used as a non-rooting target by using it behind an immutable reference. There is also `Unrooted`, which can be created by calling `Target::unrooted` or `Managed::unrooted_target`. It's useful if it's not possible to use a reference to an existing target. When an unrooted target is created with the first method, it inherits the `'target` lifetime of the target, with the second it inherits the managed data's `'scope` lifetime.
+任意のターゲットは、不変参照の背後で使用することで非ルート化ターゲットとして使用できます。また、`Unrooted` というものもあり、`Target::unrooted` または `Managed::unrooted_target` を呼び出すことで作成できます。既存のターゲットへの参照を使用することができない場合に便利です。最初の方法で非ルート化ターゲットが作成されると、ターゲットの `'target` ライフタイムを継承し、2番目の方法では管理されたデータの `'scope` ライフタイムを継承します。
 
-There are several other non-rooting targets mentioned in the table, which are all handle types, most of which we haven't seen yet. They're relatively unimportant, they're treated as targets because they can only exist when it's safe to call into Julia, introduce a useful `'target` lifetime, and targets can create new scopes.
+表に記載されている他のいくつかの非ルート化ターゲットはすべてハンドル型であり、その多くはまだ見たことがありません。それらは比較的重要ではありませんが、Juliaに安全に呼び出せるときにのみ存在でき、有用な `'target` ライフタイムを導入し、ターゲットが新しいスコープを作成できるため、ターゲットとして扱われます。

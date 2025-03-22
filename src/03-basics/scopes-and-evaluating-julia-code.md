@@ -1,14 +1,14 @@
-# Scopes and evaluating Julia code
+# スコープとJuliaコードの評価
 
-There are three steps our application needs to take to evaluate
+アプリケーションが以下のコードを評価するために必要な3つのステップがあります。
 
 ```julia
 println("Hello world!")
 ```
 
-1. Configure and start the Julia runtime.
-2. Create a scope.
-3. Evaluate the code inside the scope.
+1. Juliaランタイムを設定して開始する。
+2. スコープを作成する。
+3. スコープ内でコードを評価する。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -25,25 +25,25 @@ fn main() {
 }
 ```
 
-Let's go through this code step-by-step.
+このコードをステップバイステップで見ていきましょう。
 
 ```rust,ignore
 let handle = Builder::new().start_local().expect("cannot init Julia");
 ```
 
-This line initializes Julia and returns a `LocalHandle` to the runtime. The `Builder` lets us configure the runtime, options include setting the number of threads Julia can use and using a custom system image. When the runtime is started, the JlrsCore.jl package is loaded automatically.[^1]
+この行はJuliaを初期化し、ランタイムへの`LocalHandle`を返します。`Builder`を使用すると、Juliaが使用できるスレッド数の設定やカスタムシステムイメージの使用など、ランタイムを設定できます。ランタイムが開始されると、JlrsCore.jlパッケージが自動的にロードされます。[^1]
 
-The handle lets us call into Julia from the current thread, the runtime shuts down when it's dropped. Julia can only be initialized once per process, and can't be reinitialized after it has shut down.
+このハンドルを使用すると、現在のスレッドからJuliaを呼び出すことができ、ドロップされるとランタイムはシャットダウンします。Juliaはプロセスごとに一度だけ初期化でき、シャットダウン後に再初期化することはできません。
 
 ```rust,ignore
 handle.local_scope::<_, 1>(|mut frame| { /*snip*/ });
 ```
 
-Before we can call into Julia we have to create a scope by calling `LocalHandle::local_scope` first. This method takes a constant generic integer and a closure that provides access to a frame. The frame is used to prevent data that is managed by Julia's garbage collector, or GC, from being freed while we're using it from Rust. This is called rooting. We'll call such data managed data.
+Juliaを呼び出す前に、まず`LocalHandle::local_scope`を呼び出してスコープを作成する必要があります。このメソッドは定数ジェネリック整数とフレームへのアクセスを提供するクロージャを受け取ります。フレームは、Rustから使用している間にJuliaのガベージコレクタ（GC）によって管理されるデータが解放されないようにするために使用されます。これをルート化と呼びます。このようなデータを管理データと呼びます。
 
-An important question to ask is: when can the GC be triggered? The rough answer is whenever managed data is allocated. If the GC is triggered from some thread, it will wait until all threads that can call into Julia have reached a safepoint. Because we're only using a single thread, there are no other threads that need to reach a safepoint and the GC can run immediately, we'll leave it at that for now.
+重要な質問は、GCがいつトリガーされるかです。大まかな答えは、管理データが割り当てられるたびにです。GCがあるスレッドからトリガーされると、Juliaに呼び出しを行うことができるすべてのスレッドがセーフポイントに到達するまで待機します。単一のスレッドのみを使用しているため、セーフポイントに到達する必要がある他のスレッドはなく、GCは即座に実行できます。ここではその点に留めておきます。
 
-Functions provided by jlrs that return managed data are typically called with a mutable reference to a frame.[^2] These functions can only be called inside a scope, and their result is rooted in the frame. As long as managed data is rooted, it, and any other managed data it refers to, will not be freed by the GC. Every time data is rooted in a frame one of its slots is consumed, the number of slots is expressed by the constant generic integer. It's unfortunate, but its value can't be inferred. We need to count how many slots we use.
+管理データを返すjlrsが提供する関数は通常、フレームへの可変参照と共に呼び出されます。[^2] これらの関数はスコープ内でのみ呼び出すことができ、その結果はフレームにルート化されます。管理データがルート化されている限り、それとそれが参照する他の管理データはGCによって解放されません。データがフレームにルート化されるたびに、そのスロットの1つが消費されます。スロットの数は定数ジェネリック整数で表されます。残念ながら、その値は推測できません。使用するスロットの数を数える必要があります。
 
 ```rust,ignore
 |mut frame| {
@@ -53,14 +53,15 @@ Functions provided by jlrs that return managed data are typically called with a 
 }
 ```
 
-Inside the closure we call `Value::eval_string`, which lets us evaluate arbitrary Julia code. It takes a mutable reference to our frame and a string to evaluate, and returns the result as a `Value` rooted in this frame.[^3] A `Value` is managed data of an arbitrary type.[^4] It's unsafe to call this function because it lets us evaluate arbitrary Julia code, including silly and obviously unsound things like `unsafe_load(Ptr{UInt}(C_NULL))`.
+クロージャの中で `Value::eval_string` を呼び出します。これにより、任意のJuliaコードを評価することができます。この関数は、フレームへの可変参照と評価する文字列を受け取り、その結果をこのフレームにルートされた `Value` として返します[^3]。`Value` は任意の型の管理されたデータです[^4]。この関数を呼び出すのは安全ではありません。なぜなら、`unsafe_load(Ptr{UInt}(C_NULL))` のような愚かで明らかに不健全なことを含む任意のJuliaコードを評価できるからです。
 
-A nice property of scopes is that they naturally introduce a lifetime. Instances of `Value` and other managed types make use of this lifetime to ensure they can't outlive their scope. If we tried to remove the semicolon after `expect` our code would fail to compile because the result doesn't live long enough.
+スコープの良い特性は、それが自然にライフタイムを導入することです。`Value` や他の管理された型のインスタンスは、このライフタイムを利用してスコープを超えて生存できないことを保証します。`expect` の後のセミコロンを削除しようとすると、結果が十分に長く生存しないため、コードはコンパイルに失敗します。
 
-[^1]: If JlrsCore hasn't been installed, it will be installed by default. We can customize this with `Builder::install_jlrs_core`. Successfully loading JlrsCore is required to use jlrs.
+[^1]: JlrsCore がインストールされていない場合、デフォルトでインストールされます。`Builder::install_jlrs_core` を使用してこれをカスタマイズできます。JlrsCore のロードに成功することは、jlrs を使用するために必要です。
 
-[^2]: There are other types that can be used instead of mutable references to frames, collectively these types are called targets. We'll cover targets in the next chapter.
+[^2]: フレームへの可変参照の代わりに使用できる他の型があります。これらの型は総称してターゲットと呼ばれます。ターゲットについては次の章で説明します。
 
-[^3]: The actual argument and return types are a bit more involved. Like footnote 2, this will be covered in the next chapter.
+[^3]: 実際の引数と戻り値の型はもう少し複雑です。脚注2と同様に、これは次の章で説明します。
 
-[^4]: In this particular case `nothing` is returned, whose type is `Nothing`. If we had evaluated `1 + 2` instead, the `Value` would have contained an `Int`.
+[^4]: この特定のケースでは、`nothing` が返され、その型は `Nothing` です。代わりに `1 + 2` を評価していた場合、`Value` は `Int` を含んでいたでしょう。
+

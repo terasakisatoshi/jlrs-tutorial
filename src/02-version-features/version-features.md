@@ -1,10 +1,10 @@
-# Version features
+# バージョン機能
 
-If we add jlrs as a dependency and try to compile our crate, we'll see that this fails even after following the instructions in the previous chapter. The reason is that there's an issue we need to deal with: the Julia C API is not stable and each new version tends to introduce a few minor, but backwards-incompatible, changes. jlrs strives to handle these incompatibilities internally as much as possible, but this requires enabling a feature to select the targeted version of Julia.
+jlrsを依存関係として追加し、クレートをコンパイルしようとすると、前の章の指示に従った後でも失敗することがあります。その理由は、対処しなければならない問題があるためです。JuliaのC APIは安定しておらず、新しいバージョンが出るたびに、いくつかの小さな後方互換性のない変更が導入される傾向があります。jlrsはこれらの非互換性を可能な限り内部で処理しようとしていますが、これにはターゲットとするJuliaのバージョンを選択するための機能を有効にする必要があります。
 
-Features that select the targeted version of Julia are called version features. They are admittedly kind of a hack because version features are not additive; we must enable exactly one, and it must match the version of Julia that is used. If multiple version features, no version features, or an incorrect version feature is used, compilation will fail.
+Juliaのターゲットバージョンを選択する機能はバージョン機能と呼ばれます。これらは正直なところ一種のハックです。なぜなら、バージョン機能は加算的ではなく、正確に1つを有効にしなければならず、それは使用するJuliaのバージョンと一致しなければならないからです。複数のバージョン機能、バージョン機能がない、または間違ったバージョン機能が使用されると、コンパイルは失敗します。
 
-The following version features currently exist:
+現在存在するバージョン機能は以下の通りです：
 
 - `julia-1-6`
 - `julia-1-7`
@@ -13,7 +13,7 @@ The following version features currently exist:
 - `julia-1-10`
 - `julia-1-11`
 
-It's recommended to "reexport" these version features, and enable the correct one at compile time.
+これらのバージョン機能を「再エクスポート」し、コンパイル時に正しいものを有効にすることをお勧めします。
 
 ```toml
 [features]

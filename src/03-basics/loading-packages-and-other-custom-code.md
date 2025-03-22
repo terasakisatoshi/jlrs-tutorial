@@ -1,8 +1,8 @@
-# Loading packages and other custom code
+# パッケージとその他のカスタムコードの読み込み
 
-Everything we've done so far has involved standard functionality that's available directly in jlrs and Julia, at worst we've had to evaluate some code to define a custom type. While it's nice that we can use this essential functionality, it's reasonable that we also want to make use of packages.
+これまでに行ったことはすべて、jlrsとJuliaで直接利用可能な標準機能に関するものでした。最悪の場合、カスタムタイプを定義するためにいくつかのコードを評価する必要がありました。この基本的な機能を利用できるのは良いことですが、パッケージも利用したいと考えるのは当然です。
 
-Any package that has been installed for the targeted version of Julia can be loaded with `LocalHandle::using`.[^1]
+ターゲットとするJuliaのバージョンにインストールされているパッケージは、`LocalHandle::using`を使って読み込むことができます。[^1]
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -27,12 +27,12 @@ fn main() {
 }
 ```
 
-The function `dot` isn't defined in the `Main` module until we've called `handle.using("LinearAlgebra")`, which internally just evaluates `using LinearAlgebra`. To restrict our imports, we have to construct a `using` or `import` statement manually and evaluate it with `Value::eval_string`.
+`dot`関数は、`handle.using("LinearAlgebra")`を呼び出すまで`Main`モジュールに定義されません。これは内部的には単に`using LinearAlgebra`を評価するだけです。インポートを制限するには、`using`または`import`文を手動で構築し、`Value::eval_string`で評価する必要があります。
 
-Every package we load must have been installed in advance. Unlike the REPL, trying to use a package that hasn't been installed doesn't lead to a prompt to install it, it just fails. After a package has been loaded, its root module can be accessed with `Module::package_root_module`.
+読み込むパッケージはすべて事前にインストールされている必要があります。REPLとは異なり、インストールされていないパッケージを使用しようとすると、インストールを促すプロンプトが表示されるのではなく、単に失敗します。パッケージが読み込まれた後、そのルートモジュールには`Module::package_root_module`でアクセスできます。
 
-Including a file with custom Julia code works similarly; any file can be loaded and evaluated with `LocalHandle::include`, which calls `Main.include` with the provided path. This works well for local development, but figuring out the correct path to the file when we distribute our code can become problematic. In this case it's better to include the content of the file with the `include_str!` macro and evaluate it with `Value::eval_string`.
+カスタムJuliaコードを含むファイルを読み込むのも同様です。任意のファイルを`LocalHandle::include`で読み込み、評価することができます。これは指定されたパスで`Main.include`を呼び出します。ローカル開発には適していますが、コードを配布する際にファイルへの正しいパスを見つけるのは問題になることがあります。この場合、`include_str!`マクロを使ってファイルの内容を含め、`Value::eval_string`で評価する方が良いでしょう。
 
-[^1]: As long as we don't mess with the [`JULIA_DEPOT_PATH` environment variable]
+[^1]: [`JULIA_DEPOT_PATH`環境変数]を変更しない限り
 
-[`JULIA_DEPOT_PATH` environment variable]: https://docs.julialang.org/en/v1/manual/environment-variables/#JULIA_DEPOT_PATH
+[`JULIA_DEPOT_PATH`環境変数]: https://docs.julialang.org/en/v1/manual/environment-variables/#JULIA_DEPOT_PATH

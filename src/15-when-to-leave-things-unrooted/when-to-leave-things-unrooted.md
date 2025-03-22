@@ -1,12 +1,12 @@
-# When to leave things unrooted
+# いつルート化を避けるべきか
 
-In this tutorial we've mostly used rooting targets to ensure the managed data we created would remain valid as long as we didn't leave the scope it was tied to. In many cases, though, we don't need to root managed data and can use a non-rooting target without running into any problems.
+このチュートリアルでは、主に作成した管理データが関連付けられたスコープを離れない限り有効であることを保証するために、ルート化ターゲットを使用してきました。しかし、多くの場合、管理データをルート化する必要はなく、問題なく非ルート化ターゲットを使用できます。
 
-Some data is globally rooted, most importantly constants defined in modules. When we access such constant data with `Module::get_global`, we can safely skip rooting it and convert the `Ref`-type to a managed type if we want to use it. If the data is global but not constant, it's safe to use it without rooting it if we can guarantee its value never changes as long as we use it from Rust.
+一部のデータはグローバルにルート化されています。特に重要なのはモジュールで定義された定数です。このような定数データに `Module::get_global` でアクセスする場合、ルート化をスキップしても安全で、使用したい場合は `Ref` 型を管理型に変換できます。データがグローバルであっても定数でない場合、Rustから使用する間は値が変わらないことを保証できれば、ルート化せずに使用しても安全です。
 
-If a function returns an instance of a zero-sized type like `nothing` we don't need to root the result; there's only one, globally-rooted instance of a zero-sized type. Symbols and instances of booleans and 8-bit integers are also globally rooted.
+`nothing` のようなゼロサイズ型のインスタンスを返す関数の場合、結果をルート化する必要はありません。ゼロサイズ型のインスタンスは1つだけで、グローバルにルート化されています。シンボルやブール値、8ビット整数のインスタンスもグローバルにルート化されています。
 
-Finally, it's safe to leave data unrooted if we can guarantee the GC won't run until we're done using the data. The GC can be triggered whenever new managed data is allocated.[^1] If the GC determines it needs to run, every thread will be suspended when it reaches a safepoint. The GC runs when all threads have been suspended. If we don't call into Julia while we access the data, we won't hit a safepoint so we can leave it unrooted.
+最後に、データを使用し終わるまでGCが実行されないことを保証できる場合、データをルート化せずに残しても安全です。新しい管理データが割り当てられると、GCはいつでもトリガーされる可能性があります[^1]。GCが実行する必要があると判断した場合、各スレッドはセーフポイントに達したときに中断されます。すべてのスレッドが中断されたときにGCが実行されます。データにアクセスする間にJuliaを呼び出さなければ、セーフポイントに達しないため、ルート化せずに残すことができます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -34,4 +34,4 @@ fn main() {
 }
 ```
 
-[^1]: The GC can also be triggered manually with `Gc::gc_collect`, all targets implement this trait.
+[^1]: GCは `Gc::gc_collect` を使用して手動でトリガーすることもでき、すべてのターゲットがこのトレイトを実装しています。

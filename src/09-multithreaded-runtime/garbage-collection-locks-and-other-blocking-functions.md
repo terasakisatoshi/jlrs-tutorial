@@ -1,19 +1,19 @@
-# Garbage collection, locks, and other blocking functions
+# ガベージコレクション、ロック、およびその他のブロッキング関数
 
-Way back when we first discussed managed data and rooting, it was said that the GC can be triggered by allocating managed data. When the GC is triggered by some thread, that thread will block until all other threads that can call into Julia have reached a safepoint. A safepoint is normally reached by allocating managed data, recent versions of Julia will also reach one when a Julia function is called. When a safepoint is reached, the thread promises that all managed data it still needs to use is rooted, or at least reachable from a root.
+以前、管理データとルート化について議論した際、GCは管理データを割り当てることでトリガーされる可能性があると言われました。あるスレッドによってGCがトリガーされると、そのスレッドは、Juliaに呼び出しを行う可能性のある他のすべてのスレッドがセーフポイントに到達するまでブロックされます。セーフポイントは通常、管理データを割り当てることで到達されますが、最近のバージョンのJuliaでは、Julia関数が呼び出されたときにも到達します。セーフポイントに到達すると、そのスレッドは、まだ使用する必要のあるすべての管理データがルート化されているか、少なくともルートから到達可能であることを約束します。
 
-This isn't a problem if only one thread is used, but can easily become an issue when multiple threads can call into Julia. The problem is most obvious with locks. Let's say we have the following situation: thread A and B can call into Julia, these threads acquire a lock and allocate some Julia data. If one of the threads triggers the garbage collector while the other thread is waiting for the lock we run into a deadlock situation. The other thread will never hit a safepoint because it's waiting on a lock that will never be released.
+これは1つのスレッドのみが使用される場合には問題になりませんが、複数のスレッドがJuliaに呼び出しを行うことができる場合には容易に問題になる可能性があります。問題はロックで最も顕著です。次のような状況を考えてみましょう。スレッドAとBがJuliaに呼び出しを行うことができ、これらのスレッドがロックを取得し、Juliaデータを割り当てます。もし1つのスレッドがガベージコレクタをトリガーし、他のスレッドがロックを待っている間にデッドロック状態に陥ります。他のスレッドは、決して解放されないロックを待っているため、セーフポイントに到達することはありません。
 
-To solve this particular issue, jlrs provides several GC-safe lock types. GC-safe means that it is safe to run the GC even without hitting an explicit safepoint. If we use GC-safe locks in the problem above, the deadlock is resolved because the GC can run while we wait for the lock. The following GC-safe locks are provided:
+この特定の問題を解決するために、jlrsは複数のGCセーフロックタイプを提供します。GCセーフとは、明示的なセーフポイントに到達しなくてもGCを実行するのが安全であることを意味します。上記の問題でGCセーフロックを使用すると、ロックを待っている間にGCが実行できるため、デッドロックが解消されます。以下のGCセーフロックが提供されています：
 
 - `GcSafeMutex`
 - `GcSafeFairMutex`
 - `GcSafeRwLock`
 - `GcSafeOnceLock`
 
-These GC-safe alternatives are adapted from similarly-named types found in parking_lot and once_cell, the only difference is that blocking operations are called in a GC-safe block.
+これらのGCセーフな代替品は、parking_lotやonce_cellに見られる同様の名前のタイプから適応されたもので、唯一の違いは、ブロッキング操作がGCセーフブロックで呼び出されることです。
 
-A similar issue arises if we call arbitrary long-running code that doesn't all into Julia: it doesn't reach a safepoint, if the GC needs to run it needs to wait until this operation has completed. Since the operation doesn't need to call into Julia, it's safe to execute it in a GC-safe block. We can use the `gc_safe` function to do so, it's unsound to interact with Julia any way inside a GC-safe block.
+Juliaに呼び出しを行わない任意の長時間実行コードを呼び出す場合にも同様の問題が発生します：それはセーフポイントに到達せず、GCが実行される必要がある場合、この操作が完了するまで待つ必要があります。この操作がJuliaに呼び出しを行う必要がないため、GCセーフブロックで実行するのが安全です。`gc_safe`関数を使用してこれを行うことができますが、GCセーフブロック内でJuliaとどのようにしても相互作用するのは不健全です。
 
 ```rust,ignore
 use std::{thread, time::Duration};

@@ -1,8 +1,8 @@
-# Using targets and nested scopes
+# ターゲットとネストされたスコープの使用
 
-Functions that take a target do so by value, which means the target can only be used once.[^1] If we call such a function with `&mut frame`, only one slot of that frame will be used to root the result. This keeps counting the number of slots we need as easy as possible because we only need to count the number of times the frame is used as a target inside the closure.
+ターゲットを取る関数は値で受け取ります。つまり、ターゲットは一度しか使用できません[^1]。`&mut frame`を使ってそのような関数を呼び出すと、そのフレームのスロットは1つだけ使用され、結果をルートします。これにより、必要なスロットの数を数えるのができるだけ簡単になります。なぜなら、クロージャ内でフレームがターゲットとして使用される回数だけを数えればよいからです。
 
-This does raise an obvious question: what if the function that takes a target needs to root more than one value? The answer is that targets let us create a nested scope.
+ここで明らかな疑問が生じます。ターゲットを取る関数が複数の値をルートする必要がある場合はどうすればよいのでしょうか？答えは、ターゲットを使ってネストされたスコープを作成することです。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -34,8 +34,8 @@ fn main() {
 }
 ```
 
-This approach helps avoid rooting managed data longer than necessary. After calling `add`, only its result is rooted. The temporary values we created in that function are no longer rooted because we've left its scope.
+このアプローチは、管理されたデータを必要以上に長くルートすることを避けるのに役立ちます。`add`を呼び出した後は、その結果だけがルートされます。その関数で作成した一時的な値は、スコープを離れたため、もはやルートされません。
 
-It's strongly recommended to avoid writing functions that take a specific target type, and always take a target generically.
+特定のターゲット型を取る関数を書くことは強く避け、常にターゲットをジェネリックに取ることをお勧めします。
 
-[^1]: Some functions take a target by immutable reference and return rooted data. This data is guaranteed to be globally rooted, and the operation won't consume the target.
+[^1]: 一部の関数はターゲットを不変参照で受け取り、ルートされたデータを返します。このデータはグローバルにルートされることが保証されており、操作はターゲットを消費しません。

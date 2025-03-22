@@ -1,8 +1,8 @@
-# Types and layouts
+# 型とレイアウト
 
-We've already seen a few different types in action, but we haven't really covered Julia's type system at all.
+これまでにいくつかの異なる型を見てきましたが、Juliaの型システムについてはまだ詳しく説明していません。
 
-Every `Value` has a type, or `DataType`, which we can access at runtime.
+すべての`Value`には型、つまり`DataType`があり、これを実行時にアクセスできます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -18,10 +18,10 @@ fn main() {
 }
 ```
 
-This example prints `Float32`, the `DataType` of a 32-bits floating point number in Julia. Internally, a `Value` is a pointer to some memory managed by Julia, and its `DataType` determines the layout of the memory it's pointing to.
+この例は、Juliaにおける32ビット浮動小数点数の`DataType`である`Float32`を出力します。内部的には、`Value`はJuliaによって管理されるメモリへのポインタであり、その`DataType`が指しているメモリのレイアウトを決定します。
 
-There are three important traits that deal with this layout and type information: `ValidLayout`, `ValidField`, and `ConstructType`. They're all derivable traits, and should never be implemented manually. We'll cover the derivable traits and other code generation capabilities of jlrs later, for now it's only important to understand what these three traits encode.
+このレイアウトと型情報に関わる重要な3つのトレイトがあります：`ValidLayout`、`ValidField`、および`ConstructType`です。これらはすべて派生可能なトレイトであり、手動で実装するべきではありません。これらの派生可能なトレイトやjlrsの他のコード生成機能については後で説明しますが、今はこれら3つのトレイトが何をエンコードしているかを理解することが重要です。
 
-`ValidLayout` can be implemented by types that represent the layout of a `DataType`. It's used to check that the layout in Rust and Julia match when converting them between languages at runtime. `ValidField` is similar, but is concerned with the layout of fields rather than the layout of types. The distinction is relevant because the layout of the type might not match the layout of the field with that type. Finally, `ConstructType` is used to construct Julia type objects from Rust types. The distinction is once again relevant because not all types have a layout, a layout doesn't necessarily map to a single type object, and sometimes we'll need to express a type that's more exotic than can be expressed with a layout.
+`ValidLayout`は、`DataType`のレイアウトを表す型によって実装できます。これは、実行時にRustとJuliaの間で型を変換する際に、レイアウトが一致しているかを確認するために使用されます。`ValidField`は似ていますが、型のレイアウトではなくフィールドのレイアウトに関心があります。この区別は重要で、型のレイアウトがその型のフィールドのレイアウトと一致しない場合があるからです。最後に、`ConstructType`はRustの型からJuliaの型オブジェクトを構築するために使用されます。この区別も重要で、すべての型がレイアウトを持つわけではなく、レイアウトが単一の型オブジェクトにマップされるわけでもなく、時にはレイアウトで表現できる以上にエキゾチックな型を表現する必要があるからです。
 
-Before we start to tackle Julia arrays where we'll see all these traits in action, we're going to look at how Julia data is laid out in memory first. The next sections are not intended as a guide how to match the layout of types in Rust and Julia, we normally never implement these representations manually, but it's useful to have a basic understanding of this topic.
+これらのトレイトがどのように機能するかを実際に見るためにJuliaの配列に取り組む前に、まずJuliaのデータがメモリにどのように配置されているかを見ていきます。次のセクションは、RustとJuliaの型のレイアウトを一致させるためのガイドとして意図されているわけではありません。通常、これらの表現を手動で実装することはありませんが、このトピックについて基本的な理解を持つことは有用です。

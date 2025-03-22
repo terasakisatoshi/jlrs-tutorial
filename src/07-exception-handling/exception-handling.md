@@ -1,10 +1,10 @@
-# Exception handling
+# 例外処理
 
-Many functions in Julia can throw exceptions, including low-level functions exposed by jlrs. Examples include calling a Julia function with incorrect arguments and trying to allocate a ridiculously-sized array. These functions are typically exposed twice: as a function that catches exceptions, and one that doesn't.
+Juliaの多くの関数は例外をスローする可能性があります。これは、jlrsによって公開されている低レベルの関数も含まれます。例としては、不正な引数でJulia関数を呼び出したり、非常に大きな配列を割り当てようとしたりすることが挙げられます。これらの関数は通常、例外をキャッチする関数としない関数の2つの形で公開されます。
 
-The function that doesn't catch the exception is always unsafe. Julia exceptions are implemented with `longjmp`, when an exception is thrown control flow jumps to the nearest enclosing catch block, so we must guarantee we don't jump over any pending drops. We can call arbitrary functions in a try-block with a custom exception handler with the `catch_exceptions` function, but this remains unsafe because we still have to guarantee we don't jump over any drops. It's fine to jump out of some deeply nested scope as long as any frame that is jumped over is a ["Plain Old Frame"].
+例外をキャッチしない関数は常にunsafeです。Juliaの例外は`longjmp`で実装されており、例外がスローされると制御フローは最も近いキャッチブロックにジャンプします。そのため、保留中のドロップを飛び越えないことを保証する必要があります。`catch_exceptions`関数を使用してカスタム例外ハンドラを持つtryブロック内で任意の関数を呼び出すことができますが、依然としてドロップを飛び越えないことを保証する必要があるため、これはunsafeです。飛び越えられるフレームが["Plain Old Frame"]である限り、深くネストされたスコープからジャンプすることは問題ありません。
 
-If an exception is thrown and there is no handler available, Julia aborts the process.
+例外がスローされ、利用可能なハンドラがない場合、Juliaはプロセスを中止します。
 
 ```rust,ignore
 use jlrs::{catch::catch_exceptions, prelude::*};
@@ -26,6 +26,6 @@ fn main() {
 }
 ```
 
-This example should print `caught exception: ArgumentError("invalid Array dimensions")`.
+この例は`caught exception: ArgumentError("invalid Array dimensions")`を出力するはずです。
 
 ["Plain Old Frame"]: https://github.com/rust-lang/rfcs/blob/master/text/2945-c-unwind-abi.md#plain-old-frames

@@ -1,3 +1,3 @@
-# Return type
+# 戻り値の型
 
-The story for the return type is simpler: we need to limit ourselves to returning `isbits` types, if nothing is returned we can use `Cvoid` like we've seen in the array example. This is admittedly a major oversimplification, but possibilities are limited because we can't allocate new managed data.
+戻り値の型に関しては話は簡単です: `isbits` 型を返すことに限定する必要があります。何も返さない場合は、配列の例で見たように `Cvoid` を使用できます。これは確かに大幅な単純化ですが、新しい管理データを割り当てることができないため、可能性は限られています。

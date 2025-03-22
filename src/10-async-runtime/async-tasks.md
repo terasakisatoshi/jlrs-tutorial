@@ -1,8 +1,8 @@
-# Async tasks
+# 非同期タスク
 
-Async tasks can call async functions, and while awaiting an async function the runtime can switch to another async task. It's possible to call any Julia function as a new Julia task with the methods of the `CallAsync` trait and await its completion. For this to be effective Julia must be configured to use multiple threads.
+非同期タスクは非同期関数を呼び出すことができ、非同期関数を待機している間にランタイムは別の非同期タスクに切り替えることができます。`CallAsync`トレイトのメソッドを使用して、任意のJulia関数を新しいJuliaタスクとして呼び出し、その完了を待機することが可能です。これを効果的に行うには、Juliaが複数のスレッドを使用するように設定されている必要があります。
 
-To create an async task we'll need to implement the `AsyncTask` trait. Let's implement a simple task that adds two numbers.
+非同期タスクを作成するには、`AsyncTask`トレイトを実装する必要があります。2つの数を加算する簡単なタスクを実装してみましょう。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -55,8 +55,8 @@ fn main() {
 }
 ```
 
-The trait implementation is marked with `#[async_trait(?Send)]` because the future returned by `AsyncTask::run` can't be sent to another thread but must be executed on the runtime thread. This method is very similar to the closures we've used with scopes so far, the major difference as that it's an async method and that it takes an `AsyncGcFrame` that we haven't used before.
+トレイトの実装は`#[async_trait(?Send)]`でマークされています。これは、`AsyncTask::run`によって返される未来が他のスレッドに送信されることはできず、ランタイムスレッド上で実行されなければならないためです。このメソッドはこれまでスコープで使用してきたクロージャに非常に似ていますが、主な違いは非同期メソッドであることと、これまで使用していなかった`AsyncGcFrame`を取ることです。
 
-An `AsyncGcFrame` is a `GcFrame` that provides some extra features. In particular, the methods of the `CallAsync` trait, e.g. `call_async`, don't take an arbitrary target but must be called with a mutable reference to an `AsyncGcFrame`. These methods execute a function as a new Julia task in a way that lets us await its completion, the runtime thread can switch to other tasks while it's waiting for this task to be completed.
+`AsyncGcFrame`は、いくつかの追加機能を提供する`GcFrame`です。特に、`CallAsync`トレイトのメソッド、例えば`call_async`は任意のターゲットを取るのではなく、`AsyncGcFrame`への可変参照で呼び出されなければなりません。これらのメソッドは、関数を新しいJuliaタスクとして実行し、その完了を待機できるようにします。ランタイムスレッドは、このタスクが完了するのを待っている間に他のタスクに切り替えることができます。
 
-Dispatching an async task to the runtime is very similar to dispatching a blocking task, we just need to replace `AsyncHandle::blocking_task` with `AsyncHandle::task`.
+非同期タスクをランタイムにディスパッチするのは、ブロッキングタスクをディスパッチするのと非常に似ています。ただし、`AsyncHandle::blocking_task`を`AsyncHandle::task`に置き換える必要があります。

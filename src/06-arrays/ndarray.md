@@ -1,6 +1,6 @@
 # ndarray
 
-`BitsAccessor`, `InlineAccessor`, and `BitsAccessorMut` are compatible with ndarray via the `NdArrayView` and `NdArrayViewMut` traits. This requires enabling jlrs's `jlrs-ndarray` feature.
+`BitsAccessor`、`InlineAccessor`、および `BitsAccessorMut` は、`NdArrayView` および `NdArrayViewMut` トレイトを介して ndarray と互換性があります。これには、jlrs の `jlrs-ndarray` 機能を有効にする必要があります。
 
 ```rust,ignore
 use jlrs::{

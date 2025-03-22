@@ -1,31 +1,31 @@
-# Target types
+# ターゲットタイプ
 
-No target types have been named yet, even frames have only been called just that without elaborating what their exact type is. The following table lists all target types, which lifetime is used for `'target`, and whether it's a rooting target or not.
+ターゲットタイプはまだ指定されておらず、フレームでさえもその正確なタイプが詳述されていません。以下の表は、すべてのターゲットタイプ、`'target` に使用されるライフタイム、およびそれがルート化ターゲットかどうかを示しています。
 
-| Type                                | Rooting |
+| タイプ                                | ルート化 |
 | ----------------------------------- | ------- |
-| `LocalGcFrame<'target>`             | Yes     |
-| `&mut LocalGcFrame<'target>`        | Yes     |
-| `UnsizedLocalGcFrame<'target>`      | Yes     |
-| `&mut UnsizedLocalGcFrame<'target>` | Yes     |
-| `LocalOutput<'target>`              | Yes     |
-| `&'target mut LocalOutput`          | Yes     |
-| `LocalReusableSlot<'target>`        | Yes     |
-| `&mut LocalReusableSlot<'target>`   | Yes[^1] |
-| `GcFrame<'target>`                  | Yes     |
-| `&mut GcFrame<'target>`             | Yes     |
-| `Output<'target>`                   | Yes     |
-| `&'target mut Output`               | Yes     |
-| `ReusableSlot<'target>`             | Yes     |
-| `&mut ReusableSlot<'target>`        | Yes[^1] |
-| `AsyncGcFrame<'target>`             | Yes     |
-| `&mut AsyncGcFrame<'target>`        | Yes     |
-| `Unrooted`                          | No      |
-| `StackHandle<'target>`              | No      |
-| `Pin<&'target mut WeakHandle>`      | No      |
-| `ActiveHandle<'target>`             | No      |
-| `&Tgt where Tgt: Target<'target>`   | No      |
+| `LocalGcFrame<'target>`             | はい     |
+| `&mut LocalGcFrame<'target>`        | はい     |
+| `UnsizedLocalGcFrame<'target>`      | はい     |
+| `&mut UnsizedLocalGcFrame<'target>` | はい     |
+| `LocalOutput<'target>`              | はい     |
+| `&'target mut LocalOutput`          | はい     |
+| `LocalReusableSlot<'target>`        | はい     |
+| `&mut LocalReusableSlot<'target>`   | はい[^1] |
+| `GcFrame<'target>`                  | はい     |
+| `&mut GcFrame<'target>`             | はい     |
+| `Output<'target>`                   | はい     |
+| `&'target mut Output`               | はい     |
+| `ReusableSlot<'target>`             | はい     |
+| `&mut ReusableSlot<'target>`        | はい[^1] |
+| `AsyncGcFrame<'target>`             | はい     |
+| `&mut AsyncGcFrame<'target>`        | はい     |
+| `Unrooted`                          | いいえ   |
+| `StackHandle<'target>`              | いいえ   |
+| `Pin<&'target mut WeakHandle>`      | いいえ   |
+| `ActiveHandle<'target>`             | いいえ   |
+| `&Tgt where Tgt: Target<'target>`   | いいえ   |
 
-These targets belong to three different groups: local targets, dynamic targets, and non-rooting targets.
+これらのターゲットは、ローカルターゲット、動的ターゲット、および非ルート化ターゲットの3つの異なるグループに属します。
 
-[^1]: While a mutable reference to a `(Local)ReusableSlot` roots the data, it assigns the scope's lifetime to the result which allows the result to live until we leave the scope. This slot can be reused, though, so the data is not guaranteed to remain rooted for the entire `'target` lifetime. For this reason an unrooted reference is returned.
+[^1]: `(Local)ReusableSlot` への可変参照はデータをルート化しますが、結果にスコープのライフタイムを割り当てるため、スコープを離れるまで結果が生存することができます。このスロットは再利用可能ですが、データが `'target` ライフタイム全体にわたってルート化され続けることは保証されません。このため、非ルート化参照が返されます。

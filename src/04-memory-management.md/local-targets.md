@@ -1,8 +1,8 @@
-# Local targets
+# ローカルターゲット
 
-The frame we've use so far is a `LocalGcFrame`. It's called local because all roots are stored locally on the stack, which is why we need to know its size at compile time.
+これまで使用してきたフレームは `LocalGcFrame` です。これはローカルと呼ばれ、すべてのルートがスタック上にローカルに保存されるため、コンパイル時にそのサイズを知る必要があります。
 
-Every time we root data by using a mutable reference to a `LocalGcFrame` we consume one of its slots. It's also possible to reserve a slot as a `LocalOutput` or `LocalReusableSlot`, they can be created by calling `LocalGcFrame::local_output` and `LocalGcFrame::local_reusable_slot`. These methods consume a slot. The main difference between the two is that `LocalReusableSlot` is a bit more permissive with the lifetime of the result at the cost of returning an unrooted reference. They're useful if we need to return multiple instances of managed data from a scope, or want to reuse a slot inside one.
+`LocalGcFrame` への可変参照を使用してデータをルート化するたびに、そのスロットの1つを消費します。また、`LocalOutput` や `LocalReusableSlot` としてスロットを予約することも可能で、これらは `LocalGcFrame::local_output` および `LocalGcFrame::local_reusable_slot` を呼び出すことで作成できます。これらのメソッドはスロットを消費します。両者の主な違いは、`LocalReusableSlot` が結果のライフタイムに関して少し寛容である代わりに、ルート化されていない参照を返すことです。スコープから管理されたデータの複数のインスタンスを返す必要がある場合や、1つのスロットを再利用したい場合に便利です。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -65,7 +65,7 @@ fn main() {
 }
 ```
 
-An `UnsizedLocalGcFrame` is similar to a `LocalGcFrame`, the major difference is that its size isn't required to be known at runtime. If the size of the frame is statically known, use `LocalGcFrame`.
+`UnsizedLocalGcFrame` は `LocalGcFrame` に似ていますが、主な違いはそのサイズが実行時に知られている必要がないことです。フレームのサイズが静的にわかっている場合は、`LocalGcFrame` を使用してください。
 
 ```rust,ignore
 use jlrs::prelude::*;

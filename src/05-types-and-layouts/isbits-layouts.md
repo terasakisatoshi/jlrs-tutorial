@@ -1,8 +1,8 @@
-# `isbits` layouts
+# `isbits` レイアウト
 
-The layout of a primitive type in Julia usually matches its analog in Rust: if the `DataType` is `Int8`, a `Value` of this type is a pointer to an `i8`; if it's `Float32` the `Value` is a pointer to an `f32`. There are two exceptions: `Bool` and `Char` map to types of the same name defined in jlrs, not `bool` and `char`.
+Juliaのプリミティブ型のレイアウトは通常、Rustのアナログと一致します。`DataType` が `Int8` の場合、この型の `Value` は `i8` へのポインタです。`Float32` の場合、`Value` は `f32` へのポインタです。例外は2つあります。`Bool` と `Char` は、`bool` や `char` ではなく、jlrsで定義された同名の型にマップされます。
 
-Composite types are a bit more involved. `isbits` types are immutable types made up of primitive types and other `isbits` types. Their layout maps to the obvious `repr(C)` representation in Rust. For example, the following Rust and Julia types have the same layout in memory
+複合型はもう少し複雑です。`isbits` 型はプリミティブ型や他の `isbits` 型で構成された不変型です。これらのレイアウトは、Rustにおける明白な `repr(C)` 表現にマップされます。例えば、以下のRustとJuliaの型はメモリ内で同じレイアウトを持ちます。
 
 ```julia
 struct InnerBits
@@ -28,4 +28,4 @@ struct OuterBits {
 }
 ```
 
-Because `InnerBits` and `OuterBits` in Rust faithfully represent the layout of their corresponding type in Julia they can implement `ValidLayout`. They can implement `ValidField` because they're inlined into the composite when used as a field type. The layouts correspond to a single type in Julia, so these types can implement `ConstructType` to map the Rust type to their Julia counterpart.
+Rustの`InnerBits`と`OuterBits`は、Juliaの対応する型のレイアウトを忠実に表現しているため、`ValidLayout`を実装できます。フィールド型として使用されるときに複合型にインライン化されるため、`ValidField`を実装できます。これらのレイアウトはJuliaの単一の型に対応しているため、これらの型はRustの型をJuliaの対応する型にマッピングするために`ConstructType`を実装できます。

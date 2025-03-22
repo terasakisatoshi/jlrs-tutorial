@@ -1,8 +1,8 @@
 # Yggdrasil
 
-If we completely removed Rust from our system before trying to add and use a package that depends on Rust code like RustFFT.jl, we'd see that everything still works correctly. Things still work because a recipe to build the library is available in [Yggdrasil]. When we contribute a recipe to Yggdrasil, that library will be prebuilt and made available as a JLL package.
+RustFFT.jlのようなRustコードに依存するパッケージを追加して使用しようとする前に、システムからRustを完全に削除した場合でも、すべてが正しく動作することがわかります。すべてが正常に動作するのは、ライブラリをビルドするためのレシピが[Yggdrasil]に用意されているからです。Yggdrasilにレシピを提供すると、そのライブラリは事前にビルドされ、JLLパッケージとして利用可能になります。
 
-A recipe for a library written in Rust will typically look something like this, and should be named `build_tarballs.jl`:
+Rustで書かれたライブラリのレシピは通常次のようになり、`build_tarballs.jl`という名前にする必要があります。
 
 ```julia
 # Note that this script can accept some limited command-line arguments, run
@@ -48,15 +48,15 @@ build_tarballs(ARGS, name, version, sources, script, platforms, products, depend
                julia_compat="1.6", compilers=[:c, :rust])
 ```
 
-This recipe should work for crates that are written purely in Rust after replacing `{{user}}` and `{{crate_name}}`. If the crate depends on some other dynamic library, recipes must be available for those libraries so we can add them to the list of dependencies. This is outside the scope of this tutorial, see the [BinaryBuilder.jl documentation] for more information.
+このレシピは、`{{user}}`と`{{crate_name}}`を置き換えた後、純粋にRustで書かれたクレートに対して機能するはずです。クレートが他の動的ライブラリに依存している場合、そのライブラリのレシピも用意されている必要があり、それらを依存関係のリストに追加できます。これはこのチュートリアルの範囲外ですので、詳細は[BinaryBuilder.jl documentation]を参照してください。
 
-One final detail that we need to keep in mind is that BinaryBuilder.jl uses its own Rust toolchain. We can check which version of Rust will be used in the [recipe for the Rust toolchain].
+最後に注意すべき点は、BinaryBuilder.jlが独自のRustツールチェーンを使用していることです。Rustツールチェーンの[レシピ]で使用されるRustのバージョンを確認できます。
 
-We can test our recipe locally by executing it: `julia build_tarballs.jl`. In practice it's useful to set the `--verbose` and `--debug` flags. If `--debug` is set, a debug prompt is opened on failure to help diagnose and resolve the issue. On success, we can find the compiled library in the `products` directory, which we can use as if we had compiled it manually.
+レシピをローカルでテストするには、`julia build_tarballs.jl`を実行します。実際には、`--verbose`および`--debug`フラグを設定することが有用です。`--debug`が設定されている場合、問題を診断して解決するために失敗時にデバッグプロンプトが開かれます。成功した場合、`products`ディレクトリにコンパイルされたライブラリが見つかり、それを手動でコンパイルしたかのように使用できます。
 
-Now that we've ensured everything works as expected, we can contribute our recipe to Yggdrasil. Fork the Yggdrasil repository, create a new directory for the recipe and put it in that directory. Commit these changes with a message like `"[{{crate_name}}] version 0.1.0"` and open a PR. If everything goes well and our PR is accepted, a new package will be published named `{{crate_name}}_jll`.
+すべてが期待通りに動作することを確認したら、レシピをYggdrasilに提供できます。Yggdrasilリポジトリをフォークし、レシピ用の新しいディレクトリを作成してそのディレクトリに配置します。`"[{{crate_name}}] version 0.1.0"`のようなメッセージでこれらの変更をコミットし、PRを開きます。すべてが順調に進み、PRが受け入れられた場合、`{{crate_name}}_jll`という名前の新しいパッケージが公開されます。
 
-Using this JLL package is a matter of adding it to Julia:
+このJLLパッケージを使用するには、Juliaに追加するだけです。
 
 ```julia
 (@v1.10) pkg> add {{crate_name}}_jll
@@ -81,3 +81,5 @@ julia> ccall((:some_exported_function, {{crate_name}}_jll.lib{{crate_name}}_path
 [Yggdrasil]: https://github.com/JuliaPackaging/Yggdrasil
 [BinaryBuilder.jl documentation]: https://docs.binarybuilder.org/stable/
 [recipe for the Rust toolchain]: https://github.com/JuliaPackaging/Yggdrasil/blob/master/0_RootFS/Rust/build_tarballs.jl
+
+It seems like you haven't pasted any content yet. Please provide the Markdown content you would like translated, and I'll assist you with the translation.

@@ -1,17 +1,17 @@
-# Arrays
+# 配列
 
-So far we've only worked with relatively simple types, now it's time to look at the `Array` type. The first thing that makes this type more complex are its type parameters, the element type `T` and rank `N`, which have special handling compared to other type parameters in jlrs.
+これまで、比較的単純な型を扱ってきましたが、ここで `Array` 型を見てみましょう。この型をより複雑にしている最初の要素は、その型パラメータである要素型 `T` とランク `N` です。これらは、jlrs の他の型パラメータとは異なる特別な処理が施されています。
 
-This special handling involves a single base type, `ArrayBase<T, const N: isize>`, and aliases for the four possible cases:
+この特別な処理には、単一の基本型 `ArrayBase<T, const N: isize>` と、4つの可能なケースのエイリアスが含まれます：
 
  - `Array == ArrayBase<Unknown, -1>`
  - `TypedArray<T> == ArrayBase<T, -1>`
  - `RankedArray<const N: isize> == ArrayBase<Unknown, N>`
  - `TypedRankedArray<T, const N: isize> == ArrayBase<T, N>`
 
-As can be seen in this list it's possible to ignore the element type and rank of an array. A known element type must implement `ConstructType`, a known rank is greater than or equal to 0.
+このリストからわかるように、配列の要素型とランクを無視することが可能です。既知の要素型は `ConstructType` を実装する必要があり、既知のランクは0以上です。
 
-There are a few additional specialized type aliases:
+いくつかの追加の特殊化された型エイリアスがあります：
 
  - `Vector == RankedArray<1>`
  - `TypedVector<T> == TypedRankedArray<T, 1>`
@@ -19,14 +19,14 @@ There are a few additional specialized type aliases:
  - `Matrix == RankedArray<2>`
  - `TypedMatrix<T> == TypedRankedArray<T, 2>`
 
-The elements of Julia arrays are stored in column-major order, which is also known as "F" or "Fortran" order. The sequence `1, 2, 3, 4, 5, 6` maps to the following 2 x 3 matrix:
+Julia の配列の要素は列優先順序、つまり「F」または「Fortran」順序で格納されます。シーケンス `1, 2, 3, 4, 5, 6` は次のような2 x 3の行列にマッピングされます：
 
 ```text
 1  3  5
 2  4  6
 ```
 
-i.e.
+つまり、
 
 ```julia
 [1 3 5; 2 4 6]

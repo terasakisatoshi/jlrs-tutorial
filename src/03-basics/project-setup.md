@@ -1,12 +1,12 @@
-# Project setup
+# プロジェクトのセットアップ
 
-We first create a new binary package with `cargo`:
+まず、`cargo`を使って新しいバイナリパッケージを作成します。
 
 ```bash
 cargo new julia_app --bin
 ```
 
-Open `Cargo.toml`, add jlrs as a dependency and enable the `local_rt` feature. We abort on panics[^1], and reexport the version features:
+`Cargo.toml`を開き、`jlrs`を依存関係として追加し、`local_rt`機能を有効にします。パニック時には中断し[^1]、バージョン機能を再エクスポートします。
 
 ```toml
 [package]
@@ -32,7 +32,7 @@ panic = "abort"
 jlrs = {version = "0.21", features = ["local-rt"]}
 ```
 
-If we tried to build our application without enabling a version feature, we'd see the following error:
+バージョン機能を有効にせずにアプリケーションをビルドしようとすると、次のエラーが表示されます。
 
 ```text
 error: A Julia version must be selected by enabling exactly one of the following version features:
@@ -44,25 +44,25 @@ error: A Julia version must be selected by enabling exactly one of the following
            julia-1-11
 ```
 
-If Julia 1.10 has been installed and we've configured our environment according to the steps in the [dependency chapter], building and running should succeed after enabling the `julia-1-10` feature:
+Julia 1.10がインストールされ、[依存関係の章]に従って環境が設定されている場合、`julia-1-10`機能を有効にした後、ビルドと実行が成功するはずです。
 
 ```bash
 cargo build --features julia-1-10
 ```
 
-It's important to set the `-rdynamic` linker flag when we embed Julia on Linux, Julia will perform badly otherwise.[^2] This flag can be set on the command line with the `RUSTFLAGS` environment variable:
+LinuxでJuliaを埋め込む際には、`-rdynamic`リンカーフラグを設定することが重要です。そうしないと、Juliaのパフォーマンスが低下します。[^2] このフラグは、`RUSTFLAGS`環境変数を使用してコマンドラインで設定できます。
 
 `RUSTFLAGS="-Clink-args=-rdynamic" cargo build --features julia-1-10`
 
-It's also possible to set this flag with a `config.toml` file in the project's root directory:
+このフラグは、プロジェクトのルートディレクトリにある`config.toml`ファイルで設定することも可能です。
 
 ```toml
 [target.linux]
 rustflags = [ "-C", "link-args=-rdynamic" ]
 ```
 
-[dependency chapter]: ../01-dependencies/julia.md
+[依存関係の章]: ../01-dependencies/julia.md
 
-[^1]: In certain circumstances panicking can cause soundness issues, so it's better to abort.
+[^1]: 特定の状況では、パニックが健全性の問題を引き起こす可能性があるため、中断する方が良いです。
 
-[^2]: The nitty-gritty reason is that there's some thread-local data that Julia uses constantly. To effectively access this data, it must be defined in an application so the most performant TLS model can be used. By setting the `-rdynamic` linker flag, `libjulia` can find and make use of the definition in our application. If this flag hasn't been set Julia will fall back to a slower TLS model, which has signifant, negative performance implications. This is only important on Linux, macOS and Windows users can ignore this entirely because the concept of TLS models don't exists on these platforms.
+[^2]: 詳細な理由としては、Juliaが常に使用するスレッドローカルデータがあるためです。このデータに効果的にアクセスするためには、アプリケーション内で定義されている必要があり、最もパフォーマンスの高いTLSモデルを使用できます。`-rdynamic`リンカーフラグを設定することで、`libjulia`はアプリケーション内の定義を見つけて利用できます。このフラグが設定されていない場合、Juliaはより遅いTLSモデルにフォールバックし、パフォーマンスに大きな悪影響を及ぼします。これはLinuxでのみ重要であり、macOSやWindowsのユーザーはこの点を完全に無視できます。これらのプラットフォームではTLSモデルの概念が存在しないためです。

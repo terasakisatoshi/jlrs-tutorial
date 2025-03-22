@@ -1,8 +1,8 @@
-# Parachutes
+# パラシュート
 
-If we can't avoid data that must be dropped, it might be possible to attach a parachute to this data to ensure it's dropped safely even if an exception is thrown. When we attach a parachute to data, we move it from Rust to Julia by converting it to managed data, which makes the GC responsible for dropping it.
+データを削除しなければならない状況を避けられない場合、例外が発生しても安全に削除されるように、このデータにパラシュートを取り付けることが可能かもしれません。データにパラシュートを取り付けると、それを管理されたデータに変換してRustからJuliaに移動し、GCが削除を担当するようにします。
 
-A parachute can be attached by calling `AttachParachute::attach_parachute`, this trait is implemented for any type that is `Sized + Send + Sync + 'static`. The resulting `WithParachute` derefences to the original type, the parachute can be removed by calling `WithParachute::remove_parachute`.
+パラシュートは `AttachParachute::attach_parachute` を呼び出すことで取り付けることができます。このトレイトは `Sized + Send + Sync + 'static` である任意の型に実装されています。結果として得られる `WithParachute` は元の型を参照解除し、`WithParachute::remove_parachute` を呼び出すことでパラシュートを取り外すことができます。
 
 ```rust,ignore
 use jlrs::{catch::catch_exceptions, data::managed::parachute::AttachParachute, prelude::*};
@@ -31,4 +31,4 @@ fn main() {
 }
 ```
 
-We've attached a parachute to `vec` so it's fine that the next line throws an exception. The GC will eventually take care of dropping it for us.
+`vec` にパラシュートを取り付けたので、次の行で例外が発生しても問題ありません。GCが最終的にそれを削除してくれます。

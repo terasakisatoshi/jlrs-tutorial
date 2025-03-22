@@ -1,8 +1,8 @@
-# Managed data and functions
+# 管理されたデータと関数
 
-In the previous section we printed `"Hello, World!"` from Julia by evaluating `println("Hello, World!")`. While there's a lot we can achieve by using Julia this way, it's inflexible and has many limitations. One of these limitations is that, modulo string formatting and other gnarly work-arounds, we can't change the argument `println` is called with.
+前のセクションでは、`println("Hello, World!")` を評価して Julia から `"Hello, World!"` を出力しました。この方法で Julia を使用することで多くのことが達成できますが、柔軟性に欠け、多くの制限があります。これらの制限の一つは、文字列フォーマットや他の厄介な回避策を除けば、`println` が呼び出される引数を変更できないことです。
 
-What we really want to do is call Julia functions with arbitrary arguments. Let's start with `println(1)`.
+私たちが本当にやりたいのは、任意の引数で Julia の関数を呼び出すことです。まずは `println(1)` から始めましょう。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -22,19 +22,19 @@ fn main() {
 }
 ```
 
-The capacity of the frame is set to `3` because `&mut frame` is used three times to root managed data.
+フレームの容量は `3` に設定されています。これは、`&mut frame` が管理されたデータをルートするために3回使用されるためです。
 
-The first use of the frame happens in the call to `Value::new`, which converts data from Rust to Julia. Julia calls this boxing, to avoid confusion with boxing in Rust we'll call it "creating a value" or "converting to managed data" instead. Any type that implements `IntoJulia` can be converted to managed data with this function, jlrs provides implementations of this trait for primitive types, pointer types, and tuples with 32 or fewer fields.
+フレームの最初の使用は `Value::new` の呼び出しで発生します。これは Rust から Julia へのデータ変換を行います。Julia ではこれをボクシングと呼びますが、Rust のボクシングと混同しないように、ここでは「値の作成」または「管理されたデータへの変換」と呼びます。`IntoJulia` を実装している任意の型は、この関数で管理されたデータに変換できます。jlrs はプリミティブ型、ポインタ型、および32フィールド以下のタプルに対するこのトレイトの実装を提供しています。
 
-Most functions are globals in a module, `println` is defined in the `Base` module. Julia modules can be accessed via the `Module` type, which is a managed type just like `Value`. The functions `Module::base` and `Module::main` provide access to the `Base` and `Main` modules respectively. These functions take an immutable reference to a frame to prevent them from existing outside a scope, but they don't need to be rooted and this doesn't count as a use of the frame. Globals in Julia modules can be accessed with `Module::global`, we use the frame a second time when we call this method to root its result.[^1]
+ほとんどの関数はモジュール内のグローバルです。`println` は `Base` モジュールで定義されています。Julia のモジュールは `Module` 型を介してアクセスできます。これは `Value` と同様に管理された型です。`Module::base` と `Module::main` 関数は、それぞれ `Base` と `Main` モジュールへのアクセスを提供します。これらの関数は、スコープ外で存在しないようにするためにフレームへの不変参照を取りますが、ルートする必要はなく、これはフレームの使用としてカウントされません。Julia モジュール内のグローバルは `Module::global` でアクセスできます。このメソッドを呼び出してその結果をルートする際に、フレームを2回目に使用します。[1]
 
-Finally we call `println_fn` with the frame and one argument. This is the third and last use of the frame. Any `Value` is potentially callable, the `Call` trait provides methods to call them with any number of arguments. Specialized methods like `Call::call1` exist to call functions with 3 or fewer arguments, `Call::call` accepts an arbitrary number of arguments. Every argument must be a `Value`.
+最後に、フレームと1つの引数で `println_fn` を呼び出します。これがフレームの3回目で最後の使用です。任意の `Value` は呼び出し可能である可能性があり、`Call` トレイトは任意の数の引数でそれらを呼び出すメソッドを提供します。`Call::call1` のような特殊化されたメソッドは、3つ以下の引数で関数を呼び出すために存在し、`Call::call` は任意の数の引数を受け入れます。すべての引数は `Value` でなければなりません。
 
-Calling Julia functions is unsafe for mostly the same reason as evaluating Julia code is, nothing prevents us from calling `unsafe_load` with a wild pointer. Other risks involve thread-safety and mutably aliasing data that is directly accessed from Rust, which can't be statically prevented. In practice, most Julia code is as safe to call from Rust as it is from Julia.
+Julia関数を呼び出すことが危険である理由は、主にJuliaコードを評価することが危険である理由と同じです。何も防ぐものがないため、`unsafe_load`を不正なポインタで呼び出すことが可能です。他のリスクとしては、スレッドセーフティや、Rustから直接アクセスされるデータを可変にエイリアスすることが挙げられますが、これらは静的に防ぐことができません。実際には、ほとんどのJuliaコードは、Rustから呼び出すのと同じくらい安全です。
 
-One thing that should be noted is that while calling a function is more efficient than evaluating Julia code, each argument is passed as a `Value`. This means every function call involves dynamically dispatching to the appropriate method, which can cause significant overhead if we call small functions. In practice it's best to do as much as possible in Julia, and keep the code necessary to call it from Rust as simple as possible. This gives Julia the opportunity to optimize, and we avoid the verbosity of the low-level interfaces jlrs exposes.
+注意すべき点として、関数を呼び出すことはJuliaコードを評価するよりも効率的ですが、各引数は`Value`として渡されます。これは、関数呼び出しごとに適切なメソッドへの動的ディスパッチが行われることを意味し、小さな関数を呼び出す場合には大きなオーバーヘッドを引き起こす可能性があります。実際には、できるだけ多くの処理をJuliaで行い、Rustから呼び出すために必要なコードをできるだけシンプルに保つのが最善です。これにより、Juliaが最適化する機会を得られ、jlrsが公開する低レベルインターフェースの冗長性を避けることができます。
 
-All of that said, we didn't want to print `1`, we wanted to print `Hello, World!`. If we tried the most obvious thing and replaced `1usize` in the code above with `"Hello, World!"`, we'd see that this would fail to compile because `&str` doesn't implement `IntoJulia`. We need to use another managed type, `JuliaString`, which maps to Julia's `String` type.
+とはいえ、私たちは`1`を出力したかったのではなく、`Hello, World!`を出力したかったのです。最も明白な方法で、上記のコードの`1usize`を`"Hello, World!"`に置き換えようとすると、`&str`が`IntoJulia`を実装していないため、コンパイルに失敗することがわかります。別の管理型である`JuliaString`を使用する必要があります。これはJuliaの`String`型に対応しています。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -54,6 +54,6 @@ fn main() {
 }
 ```
 
-So far we've encountered three managed types, `Value`, `Module`, and `JuliaString`, we'll see several more in the future. All managed types implement the `Managed` trait and have at least one lifetime that encodes their scope, the method `Managed::as_value` can be used to convert managed data to a `Value`.
+これまでに、`Value`、`Module`、`JuliaString`という3つの管理型に出会いましたが、今後さらに多くの管理型を目にすることになるでしょう。すべての管理型は`Managed`トレイトを実装しており、そのスコープをエンコードする少なくとも1つのライフタイムを持っています。`Managed::as_value`メソッドを使用して、管理データを`Value`に変換することができます。
 
-[^1]: We didn't need to use the frame a second time here, but that's outside the scope of this chapter.
+[^1]: ここでフレームを再度使用する必要はありませんでしたが、それはこの章の範囲外です。

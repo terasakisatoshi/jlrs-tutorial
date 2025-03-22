@@ -1,8 +1,8 @@
-# Casting, unboxing and accessing managed data
+# キャスト、アンボクシング、管理データへのアクセス
 
-So far, the only Julia function we've called is `println`, which isn't particularly interesting because it returns `nothing`. In practice, we often don't just want to call Julia functions for their side-effects, we also want to use their results in Rust.
+これまでのところ、呼び出した唯一のJulia関数は`println`であり、これは特に面白くありません。なぜなら、`nothing`を返すからです。実際には、Julia関数を副作用のためだけでなく、その結果をRustで使用したいことがよくあります。
 
-A `Value` is an instance of some Julia type, managed by the GC. If there's a more specific managed type for that Julia type, we can convert the `Value` by casting it with `Value::cast`.
+`Value`は、GCによって管理されるあるJulia型のインスタンスです。そのJulia型に対してより具体的な管理型がある場合、`Value::cast`を使って`Value`をキャストすることで変換できます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -21,7 +21,7 @@ fn main() {
 }
 ```
 
-Managed types aren't the only types that map between Rust and Julia. There are many types where the layout in Rust matches the layout of the managed data, including most primitive types. These types implement the `Unbox` trait which lets us extract the data from the `Value` with `Value::unbox`.
+管理型だけがRustとJuliaの間でマッピングされる型ではありません。Rustのレイアウトが管理データのレイアウトと一致する多くの型があり、ほとんどのプリミティブ型がこれに含まれます。これらの型は`Unbox`トレイトを実装しており、`Value::unbox`を使って`Value`からデータを抽出できます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -37,7 +37,7 @@ fn main() {
 }
 ```
 
-If there's no appropriate type that implements `Unbox` or `Managed`, we can access the fields of a `Value` manually.
+`Unbox`または`Managed`を実装する適切な型がない場合、`Value`のフィールドに手動でアクセスできます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -87,6 +87,6 @@ fn main() {
 }
 ```
 
-There's a lot going on in this example, but a lot of it is just setup code. We first evaluate some Julia code that defines `CustomType`. Constructors in Julia are just functions linked to a type, so we can call `CustomType`'s constructor by calling the result of the code we've evaluated. Finally, we get to the point and use `Value::get_field` to access the fields before unboxing their content.[^1] The second field is unboxed as a `Bool`, not a `bool`. The Julia `Char` type similarly maps to jlrs's `Char` type. These types exist to avoid any potential mismatches between Rust and Julia.
+この例では多くのことが行われていますが、その多くはセットアップコードに過ぎません。まず、`CustomType`を定義するJuliaコードを評価します。Juliaのコンストラクタは型にリンクされた関数に過ぎないので、評価したコードの結果を呼び出すことで`CustomType`のコンストラクタを呼び出すことができます。最後に、`Value::get_field`を使用してフィールドにアクセスし、その内容をアンボックスします[^1]。2番目のフィールドは`bool`ではなく`Bool`としてアンボックスされます。同様に、Juliaの`Char`型はjlrsの`Char`型にマップされます。これらの型は、RustとJuliaの間での潜在的な不一致を避けるために存在します。
 
-[^1]: `Value::get_field` accesses a field by name, if we had wanted to access a field of a tuple we would have needed to do so by index with `Value::get_nth_field`. Indexing starts at 0.
+[^1]: `Value::get_field`は名前でフィールドにアクセスします。タプルのフィールドにアクセスしたい場合は、`Value::get_nth_field`を使ってインデックスでアクセスする必要があります。インデックスは0から始まります。

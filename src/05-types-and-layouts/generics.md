@@ -1,13 +1,13 @@
-# Generics
+# ジェネリクス
 
-Types in Julia can have parameters, which may or may not affect the layout of the type.
+Juliaの型にはパラメータを持たせることができ、これが型のレイアウトに影響を与える場合と与えない場合があります。
 
-There are two reasons why a type parameter might not affect the layout:
+型パラメータがレイアウトに影響を与えない理由は2つあります：
 
-1. it's a value parameter, not referenced by any of the fields.
-2. it affects the layout of a field that isn't inlined.
+1. それがフィールドで参照されていない値パラメータである。
+2. インライン化されていないフィールドのレイアウトに影響を与える。
 
-Any type parameter that doesn't affect the layout can be elided, otherwise it can be treated the same way in Rust and Julia:
+レイアウトに影響を与えない型パラメータは省略可能ですが、それ以外の場合はRustとJuliaで同様に扱うことができます：
 
 ```julia
 struct Generic{T}
@@ -40,6 +40,6 @@ struct Elided {
 }
 ```
 
-All three types can implement `ValidLayout` and `ValidField` because they're immutable types in Julia. In the case of `Generic` it's required that `T: ValidField`. If `T` is some mutable or otherwise non-inlined type, we can express the layout type as `Generic<Option<ValueRef>>`.
+これら3つの型はすべて`ValidLayout`と`ValidField`を実装できます。なぜなら、Juliaでは不変の型だからです。`Generic`の場合、`T: ValidField`であることが必要です。`T`が可変であるか、その他の非インライン化された型である場合、レイアウト型を`Generic<Option<ValueRef>>`として表現できます。
 
-`Generic` and `SetGeneric` don't elide any type parameters so they can implement `ConstructType`, but `Elided` is unaware of the type paramater `T`.
+`Generic`と`SetGeneric`は型パラメータを省略しないため、`ConstructType`を実装できますが、`Elided`は型パラメータ`T`を認識しません。

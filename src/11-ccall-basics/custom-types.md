@@ -1,10 +1,10 @@
-# Custom types
+# カスタムタイプ
 
-What if we want to expose Rust data of a type that doesn't correspond to any Julia type?
+Rustのデータを、どのJuliaタイプにも対応しないタイプで公開したい場合はどうすればよいでしょうか？
 
-The most straighforward option is to box the data, leak it as a pointer, and treat it as `Ptr{Cvoid}` in Julia. `Ptr{Cvoid}` is an `isbits` type, so we can simply return the pointer from Rust and expect a `Ptr{Cvoid}` in Julia. We'll need a custom function to free the data we've leaked when we're done using it.
+最も簡単な方法は、データをボックス化し、ポインタとしてリークし、Juliaで`Ptr{Cvoid}`として扱うことです。`Ptr{Cvoid}`は`isbits`タイプなので、Rustからポインタを単純に返し、Juliaで`Ptr{Cvoid}`を期待することができます。使用が終わったら、リークしたデータを解放するためのカスタム関数が必要になります。
 
-For the sake of clarity, the examples in this tutorial assume our library is on the library search path so we can access its content by name.
+明確にするために、このチュートリアルの例では、ライブラリの検索パスにライブラリがあると仮定し、その内容に名前でアクセスできるようにしています。
 
 ```rust,ignore
 #[no_mangle]
@@ -41,7 +41,7 @@ julia> ccall((:free_rs_string, "libjulia_lib"), Cvoid, (Ptr{Cvoid},), rs_s)
 
 ```
 
-If we can't box the data we'll need to adapt to this type in Julia by defining an immutable type.
+データをボックス化できない場合は、Juliaで不変タイプを定義してこのタイプに適応する必要があります。
 
 ```rust,ignore
 #[repr(C)]

@@ -1,6 +1,6 @@
-# Generating bindings
+# バインディングの生成
 
-We can generate bindings for Julia types with the `reflect` function found in the `Reflect` module of JlrsCore.jl, it can be called with a vector of types.
+`JlrsCore.jl`の`Reflect`モジュールにある`reflect`関数を使用して、Juliaの型のバインディングを生成できます。この関数は型のベクターを引数として呼び出すことができます。
 
 ```julia
 julia> using JlrsCore.Reflect
@@ -31,17 +31,17 @@ pub struct MyWrapper {
 }
 ```
 
-As we can see, only `MyWrapper` has to be included to recursively generate bindings for `MyStruct` as well.[^1] The generated bindings derive all traits they can, and are annotated with the path to the type they've been generated from. It's important that this path matches the path where the type exists at runtime.
+ご覧のとおり、`MyWrapper`だけを含めることで、`MyStruct`のバインディングも再帰的に生成されます[^1]。生成されたバインディングは可能な限りすべてのトレイトを派生し、生成元の型へのパスが注釈として付けられています。このパスが実行時に型が存在するパスと一致することが重要です。
 
-`reflect` has two keyword parameters, `f16` and `complex`. Either of these can be set to true when the feature with the same name is enabled for jlrs to map a `Float16` to `half::f16` and `Complex{T}` to `num::Complex<T>` respectively.
+`reflect`には2つのキーワードパラメータ、`f16`と`complex`があります。これらのいずれかを`true`に設定すると、同名の機能が有効になっている場合、`Float16`を`half::f16`に、`Complex{T}`を`num::Complex<T>`にそれぞれマッピングします。
 
-There are three things that `reflect` can't handle:
+`reflect`が処理できないものが3つあります：
 
-1. Types that have a field with a `Union` type that references a generic parameter.
-2. Types that have a field with a `Tuple` type that references a generic parameter.
-3. Types with atomic fields.[^2]
+1. ジェネリックパラメータを参照する`Union`型のフィールドを持つ型。
+2. ジェネリックパラメータを参照する`Tuple`型のフィールドを持つ型。
+3. アトミックフィールドを持つ型[^2]。
 
-Note that this list doesn't include `Union` fields in general; as long as all possible variants are known, the layout is static and a valid layout can be generated:
+このリストには一般的な`Union`フィールドは含まれていません。すべての可能なバリアントが既知であれば、レイアウトは静的であり、有効なレイアウトを生成できます：
 
 ```julia
 julia> using JlrsCore.Reflect
@@ -75,9 +75,9 @@ pub struct MyUnionStruct<'scope, 'data> {
 }
 ```
 
-Support for inlined unions is limited to representation, the `BitsUnion` type is an opaque blob of bytes.
+インラインされたユニオンのサポートは表現に限定されており、`BitsUnion`型は不透明なバイトの塊です。
 
-If bindings for a parametric type are requested, the most generic bindings are generated:
+パラメトリック型のバインディングが要求された場合、最も一般的なバインディングが生成されます：
 
 ```julia
 julia> using JlrsCore.Reflect
@@ -95,9 +95,9 @@ pub struct MyParametricStruct<T> {
 }
 ```
 
-Despite asking for bindings for `MyParametricStruct{UInt8}`, we got them for `MyParametricStruct{T}`.
+`MyParametricStruct{UInt8}`のバインディングを要求したにもかかわらず、`MyParametricStruct{T}`のバインディングが得られました。
 
-Any type parameter that doesn't affect the layout is elided. In this case a separate layout type and type constructor are generated, which are linked with the `HasLayout` trait:
+レイアウトに影響を与えない型パラメータは省略されます。この場合、別個のレイアウト型と型コンストラクタが生成され、`HasLayout`トレイトでリンクされます：
 
 ```julia
 julia> using JlrsCore.Reflect
@@ -121,6 +121,6 @@ pub struct MyElidedStructTypeConstructor<T> {
 }
 ```
 
-[^1]: Every type that is recursively inlined into the requested layout is included.
+[^1]: 要求されたレイアウトに再帰的にインラインされたすべての型が含まれます。
 
-[^2]: Type constuctors are generated for types with atomic fields.
+[^2]: アトミックフィールドを持つ型には型コンストラクタが生成されます。

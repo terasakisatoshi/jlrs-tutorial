@@ -1,6 +1,6 @@
-# Testing applications
+# アプリケーションのテスト
 
-When we test a binary crate that embeds Julia we have to keep in mind that Julia can only be initialized once. The easiest way to ensure this is by limiting ourselves to integration tests in a separate `tests` directory, and defining a single test per file. Each file in the `tests` directory is executed in a separate process, the single test ensures we only use Julia from a single thread.[^1] This approach applies to all runtimes.
+Juliaを組み込んだバイナリクレートをテストする際には、Juliaは一度しか初期化できないことを念頭に置く必要があります。これを確実にする最も簡単な方法は、別の`tests`ディレクトリに統合テストを限定し、ファイルごとに1つのテストを定義することです。`tests`ディレクトリ内の各ファイルは別々のプロセスで実行され、単一のテストにより、単一のスレッドからのみJuliaを使用することが保証されます。このアプローチはすべてのランタイムに適用されます。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -19,6 +19,6 @@ fn test_fn() {
 }
 ```
 
-This restriction doesn't apply to doctests, each doctest runs in a separate process.
+この制約はドクトテストには適用されません。各ドクトテストは別々のプロセスで実行されます。
 
-[^1]: Setting `--test-threads=1` doesn't allow multiple tests per file, the different tests would run sequentially but do so from different threads.
+[^1]: `--test-threads=1`を設定しても、ファイルごとに複数のテストを許可するわけではありません。異なるテストは順次実行されますが、異なるスレッドから実行されます。

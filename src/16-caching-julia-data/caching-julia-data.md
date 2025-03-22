@@ -1,6 +1,6 @@
-# Caching Julia data
+# Juliaデータのキャッシュ
 
-Accessing data in a module can be expensive, especially if we need to access it often. These accesses can be cached with a `StaticRef`, which can be defined with the `define_static_ref!` macro and accessed with the `static_ref!` macro.
+モジュール内のデータにアクセスすることは高コストになることがあります。特に頻繁にアクセスする必要がある場合はなおさらです。これらのアクセスは、`StaticRef`を使用してキャッシュすることができます。`StaticRef`は、`define_static_ref!`マクロで定義し、`static_ref!`マクロでアクセスできます。
 
 ```rust,ignore
 use jlrs::{define_static_ref, prelude::*, static_ref};
@@ -25,7 +25,7 @@ fn main() {
 }
 ```
 
-It's possible to combine these two operations with `inline_static_ref!`, this is useful if we only need to use the data in a single function or want to expose a separate function to access it.
+これら2つの操作を`inline_static_ref!`で組み合わせることも可能です。これは、データを単一の関数でのみ使用する必要がある場合や、アクセスするための別の関数を公開したい場合に便利です。
 
 ```rust,ignore
 use jlrs::{inline_static_ref, prelude::*};
@@ -56,6 +56,6 @@ fn main() {
 }
 ```
 
-A `StaticRef` is thread-safe: it's just an atomic pointer internally, which is initialized when it's first accessed. Any thread that can call into Julia can access it, if multiple threads try to access this data before it has been initialazed, all these threads will try to initialize it. The data is globally rooted so we don't need to root it ourselves.[^1]
+`StaticRef`はスレッドセーフです。内部的には単なるアトミックポインタで、初めてアクセスされたときに初期化されます。Juliaに呼び出せるスレッドはどれでもアクセス可能で、複数のスレッドが初期化される前にこのデータにアクセスしようとした場合、すべてのスレッドが初期化を試みます。データはグローバルにルートされているので、自分でルートする必要はありません。[^1]
 
-[^1]: One thing that's important to remember is that mutation can cause previously global data to become unreachable. It's our responsibility to guarantee we never change a global that's exposed as a `StaticRef`.
+[^1]: 重要なこととして、変更が以前のグローバルデータを到達不能にする可能性があることを覚えておく必要があります。`StaticRef`として公開されているグローバルを変更しないことを保証するのは私たちの責任です。

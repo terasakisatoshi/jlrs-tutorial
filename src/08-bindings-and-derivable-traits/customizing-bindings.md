@@ -1,8 +1,8 @@
-# Customizing bindings
+# バインディングのカスタマイズ
 
-When `reflect` is used, the names of types and fields of the generated bindings are the same as their Julia counterparts. The type in Julia is also expected to be defined at a specific path. If this is problematic or otherwise undesirable, these names can be adjusted.
+`reflect`を使用すると、生成されたバインディングの型やフィールドの名前は、Juliaの対応するものと同じになります。Juliaの型も特定のパスで定義されていることが期待されます。これが問題であるか、望ましくない場合、これらの名前を調整することができます。
 
-`reflect` doesn't return a string, but an instance of a type called `Layouts` that can be used with the `renamestruct!`, `renamefields!`, and `overridepath!` functions. The functions are exported by the `Reflect` module, `renamestruct!` lets us rename the Rust type, `renamefields!` the fields of a generated type, and `overridepath!` overrides the path where the type object is defined in Julia.
+`reflect`は文字列を返すのではなく、`Layouts`という型のインスタンスを返します。これは`renamestruct!`、`renamefields!`、および`overridepath!`関数と共に使用できます。これらの関数は`Reflect`モジュールによってエクスポートされており、`renamestruct!`はRustの型の名前を変更し、`renamefields!`は生成された型のフィールドの名前を変更し、`overridepath!`はJuliaで型オブジェクトが定義されているパスを上書きします。
 
 ```julia
 julia> using JlrsCore.Reflect

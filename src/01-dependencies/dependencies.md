@@ -1,3 +1,3 @@
-# Dependencies
+# 依存関係
 
-Before we can use jlrs, we have to install several dependencies: a supported version of Julia, a supported version of Rust, and a C compiler.
+jlrsを使用する前に、いくつかの依存関係をインストールする必要があります。サポートされているバージョンのJulia、サポートされているバージョンのRust、およびCコンパイラです。

@@ -1,14 +1,14 @@
-# Cross-language LTO
+# クロス言語LTO
 
-At the core of jlrs lives a small static library written in C. This library serves a few purposes:
+jlrsの中心には、Cで書かれた小さな静的ライブラリがあります。このライブラリは以下の目的を果たします：
 
- - It hides implementation details of Julia's C API.
- - It exposes functionality implemented in terms of macros and static inline functions.
- - It provides work-arounds for backwards-incompatible changes.
+ - JuliaのC APIの実装詳細を隠します。
+ - マクロや静的インライン関数で実装された機能を公開します。
+ - 後方互換性のない変更に対する回避策を提供します。
 
-Many operations are delegated to this library, which tend to be very cheap compared to the overhead of calling a function. Because the library is written in C, these functions will never be inlined.
+多くの操作はこのライブラリに委任されており、関数を呼び出すオーバーヘッドと比べると非常に安価です。このライブラリはCで書かれているため、これらの関数はインライン化されることはありません。
 
-If we use `clang` to build this library, we can enable cross-language LTO with the `lto` feature if `clang` and `rustc` use the same major LLVM version. We can query what version of clang we need to use with `rustc -vV`.
+このライブラリを`clang`でビルドする場合、`clang`と`rustc`が同じメジャーLLVMバージョンを使用している場合に、`lto`機能を使ってクロス言語LTOを有効にできます。`rustc -vV`を使って、どのバージョンのclangを使用する必要があるかを確認できます。
 
 ```bash
 > rustc -vV
@@ -21,7 +21,7 @@ release: 1.80.1
 LLVM version: 18.1.7
 ```
 
-The relevant information is in the final line: LLVM 18 is used, so we need to use clang-18.
+関連情報は最終行にあります：LLVM 18が使用されているので、clang-18を使用する必要があります。
 
 ```bash
 RUSTFLAGS="-Clinker-plugin-lto -Clinker=clang-18 -Clink-arg=-fuse-ld=lld -Clink-args=-rdynamic" \
@@ -29,4 +29,4 @@ CC=clang-18 \
 cargo build --release --features {{julia_version}}
 ```
 
-Cross-language LTO has only been tested on Linux, it can be enabled for applications and dynamic libraries. It has no effect on the performance of Julia code, only on Rust code that calls into the intermediate library.
+クロス言語LTOはLinuxでのみテストされており、アプリケーションや動的ライブラリに対して有効にできます。これはJuliaコードのパフォーマンスには影響を与えず、中間ライブラリを呼び出すRustコードにのみ影響します。

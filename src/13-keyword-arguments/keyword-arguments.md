@@ -1,10 +1,10 @@
-# Keyword arguments
+# キーワード引数
 
-Calling a function with custom keyword arguments involves a few small steps:
+カスタムキーワード引数を使用して関数を呼び出すには、いくつかの小さなステップが必要です：
 
-1. Create a `NamedTuple` with the custom arguments with `named_tuple!`.
-2. Provide those arguments to the function we want to call with `ProvideKeyword::provide_keywords`.
-3. Call the resulting `WithKeywords` instance with the positional arguments; `WithKeywords` implements `Call`.
+1. `named_tuple!`を使用してカスタム引数を持つ`NamedTuple`を作成します。
+2. `ProvideKeyword::provide_keywords`を使用して、呼び出したい関数にその引数を提供します。
+3. 結果として得られる`WithKeywords`インスタンスを位置引数で呼び出します。`WithKeywords`は`Call`を実装しています。
 
 ```rust,ignore
 use jlrs::prelude::*;

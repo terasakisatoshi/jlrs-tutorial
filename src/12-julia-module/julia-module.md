@@ -1,8 +1,8 @@
 # `julia_module!`
 
-In the previous chapter we've created a dynamic library that exposed Rust code to Julia without using jlrs. Using jlrs provides many additional features, including better support for custom types, code generation, and integration with Julia code. The main disadvantage is that our library won't be compatible with different versions of Julia, but is compiled for the specific version selected with a version feature.
+前の章では、jlrsを使用せずにRustコードをJuliaに公開する動的ライブラリを作成しました。jlrsを使用することで、カスタムタイプのサポートの向上、コード生成、Juliaコードとの統合など、多くの追加機能が提供されます。主な欠点は、ライブラリが異なるバージョンのJuliaと互換性がなく、バージョン機能で選択された特定のバージョン用にコンパイルされることです。
 
-In this chapter we'll use the `julia_module!` macro to export constants, types and functions to Julia. To use this make we have to enable the `jlrs-derive` and `ccall` features.
+この章では、`julia_module!`マクロを使用して、定数、型、関数をJuliaにエクスポートします。これを使用するには、`jlrs-derive`と`ccall`機能を有効にする必要があります。
 
 ```toml
 [package]
@@ -31,9 +31,9 @@ crate-type = ["cdylib"]
 jlrs = { version = "0.21", features = ["jlrs-derive", "ccall"] }
 ```
 
-It's important that we don't enable any runtime features like `local-rt` when we build a dynamic library.
+動的ライブラリをビルドする際には、`local-rt`のようなランタイム機能を有効にしないことが重要です。
 
-The following is a minimal example of `julia_module!`:
+以下は`julia_module!`の最小限の例です：
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -45,7 +45,7 @@ julia_module! {
 }
 ```
 
-The macro is transformed into a single function, `julia_module_tutorial_init_fn`, that can be used with JlrsCore.jl's `@wrapmodule` macro:
+このマクロは単一の関数`julia_module_tutorial_init_fn`に変換され、JlrsCore.jlの`@wrapmodule`マクロと共に使用できます：
 
 ```julia
 module JuliaModuleTutorial
@@ -59,4 +59,4 @@ end
 end
 ```
 
-This is all the Julia code we'll need to write, the `@wrapmodule` macro generates the content of the module. For the sake of brevity, code samples in the following sections will write `module JuliaModuleTutorial ... end` as a shorthand for this module definition.
+これが私たちが書く必要のあるすべてのJuliaコードであり、`@wrapmodule`マクロがモジュールの内容を生成します。簡潔さのために、以下のセクションのコードサンプルでは、このモジュール定義の省略形として`module JuliaModuleTutorial ... end`と書きます。

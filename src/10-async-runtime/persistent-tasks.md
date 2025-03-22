@@ -1,8 +1,8 @@
-# Persistent tasks
+# 永続タスク
 
-Persistent tasks let us set up a task that we can send messages to indepently of the async runtime. When a persistent task is executed, it sets up its internal state and returns a handle that lets us call the task with some input data. The internal state is allowed to reference managed data. The task lives until all handles have been dropped.
+永続タスクを使用すると、非同期ランタイムとは独立してメッセージを送信できるタスクを設定できます。永続タスクが実行されると、その内部状態を設定し、入力データを使ってタスクを呼び出すためのハンドルを返します。内部状態は管理されたデータを参照することが許可されています。タスクはすべてのハンドルが破棄されるまで存在します。
 
-To create a persistent task we'll need to implement the `PersistentTask` trait. Let's implement a task that accumulates a sum of floating point numbers.
+永続タスクを作成するには、`PersistentTask` トレイトを実装する必要があります。浮動小数点数の合計を蓄積するタスクを実装してみましょう。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -89,8 +89,8 @@ fn main() {
 }
 ```
 
-When the persistent task is started by the async runtime, the `init` method is called to initialize the state of the task. In this case the state is an instance of `Ref{Float64}`, We can't use a `Float64` directly because `Float64` isn't a mutable type. Any data rooted in the async frame provided to `init` function remains rooted until the task has shut down, a local scope is used to root temporary data so we only need to root the state in the async frame.
+非同期ランタイムによって永続タスクが開始されると、タスクの状態を初期化するために `init` メソッドが呼び出されます。この場合、状態は `Ref{Float64}` のインスタンスです。`Float64` は可変型ではないため、直接 `Float64` を使用することはできません。`init` 関数に提供される非同期フレームに根付いたデータは、タスクがシャットダウンするまで根付いたままです。一時データを根付かせるためにローカルスコープが使用されるので、非同期フレームに状態を根付かせるだけで済みます。
 
-If the task is initialized successfully a `PersistentHandle` is returned. This handle provides a `call` method which lets us call the task's `run` method with some input data. This works just like dispatching a task to the async runtime.
+タスクが正常に初期化されると、`PersistentHandle` が返されます。このハンドルは `call` メソッドを提供し、入力データを使ってタスクの `run` メソッドを呼び出すことができます。これは非同期ランタイムにタスクをディスパッチするのと同じように機能します。
 
-Like an `AsyncHandle`, a `PersistentHandle` can be cloned and shared across threads. The task shuts down when all of its handles have been dropped.
+`AsyncHandle` と同様に、`PersistentHandle` はクローンしてスレッド間で共有することができます。すべてのハンドルが破棄されると、タスクはシャットダウンします。

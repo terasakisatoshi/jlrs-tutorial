@@ -1,10 +1,10 @@
-# ccall basics
+# ccallの基本
 
-So far we've focussed on calling Julia from Rust by embedding Julia in a Rust application, in this chapter we start with the other side of the story: calling Rust from Julia. One of the nice features of Julia is its `ccall` interface, which can call functions that use the C ABI, including `extern "C"` functions in Rust.[^1] Most of this chapter won't use jlrs, Julia can load arbitrary dynamic libraries at runtime.
+これまで、RustアプリケーションにJuliaを組み込んでRustからJuliaを呼び出すことに焦点を当ててきましたが、この章では逆の側面、つまりJuliaからRustを呼び出すことを始めます。Juliaの素晴らしい機能の一つに`ccall`インターフェースがあります。これはC ABIを使用する関数、つまりRustの`extern "C"`関数を呼び出すことができます[^1]。この章のほとんどではjlrsを使用しません。Juliaは実行時に任意の動的ライブラリをロードできます。
 
-The intent of this chapter is to cover some essential information about `ccall`. For more in-depth information, read the [Calling C and Fortran Code] chapter in the Julia manual.
+この章の目的は、`ccall`に関する基本的な情報をカバーすることです。より詳細な情報については、Juliaマニュアルの[Calling C and Fortran Code]章を参照してください。
 
-To get started with calling into Rust from Julia, we're going to look at a final embedding example first before creating our first dynamic library. We'll expose a function pointer to Julia and call it with `ccall`.
+JuliaからRustを呼び出すことを始めるために、最初に動的ライブラリを作成する前に、最終的な埋め込み例を見ていきます。関数ポインタをJuliaに公開し、`ccall`でそれを呼び出します。
 
 ```rust,ignore
 use std::ffi::c_void;
@@ -45,8 +45,8 @@ fn main() {
 }
 ```
 
-All this example does is call `add`, which adds two numbers and returns the result. We can convert this function to `Value` by converting it to a void pointer first. It's not possible to call `ccall` directly from Rust because the return and argument types must be statically known, so we create a function that `ccall`s the function pointer with the given arguments by evaluating its definition.
+この例が行うことは、2つの数を加算して結果を返す`add`を呼び出すだけです。この関数をまずvoidポインタに変換することで`Value`に変換できます。戻り値と引数の型が静的に知られている必要があるため、Rustから直接`ccall`を呼び出すことはできません。そのため、定義を評価することで与えられた引数で関数ポインタを`ccall`する関数を作成します。
 
-[^1]: An ABI defines things like how a function call works at a binary level.
+[^1]: ABIは、関数呼び出しがバイナリレベルでどのように機能するかなどを定義します。
 
 [Calling C and Fortran Code]: https://docs.julialang.org/en/v1/manual/calling-c-and-fortran-code/

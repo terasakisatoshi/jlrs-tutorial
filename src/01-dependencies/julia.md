@@ -1,23 +1,25 @@
 # Julia
 
-jlrs currently supports Julia 1.6 up to and including Julia 1.11. Using the most recent stable version is recommended. While juliaup can be used, manually installing Julia is recommended. The reason is that to compile jlrs successfully, the path to the Julia's header files and library must be known and this can be tricky to achieve with juliaup.
+jlrsは現在、Julia 1.6からJulia 1.11までをサポートしています。最新の安定版を使用することをお勧めします。juliaupを使用することもできますが、手動でJuliaをインストールすることをお勧めします。その理由は、jlrsを正常にコンパイルするためには、Juliaのヘッダーファイルとライブラリへのパスを知っている必要があり、これはjuliaupでは達成が難しい場合があるからです。
 
-There are several platform-dependent ways to make these paths known:
+これらのパスを認識させるためのプラットフォーム依存の方法はいくつかあります：
 
 #### Linux
 
-If `julia` is on your `PATH` at `/path/to/bin/julia`, the main header file is expected to live at `/path/to/include/julia/julia.h` and the library at `/path/to/lib/libjulia.so`. If you do not want to add `julia` to your `PATH`, you can set the `JULIA_DIR` environment variable instead. If `JULIA_DIR=/path/to`, the headers and library must live at the previously mentioned paths.
+`julia`が`/path/to/bin/julia`にある場合、メインのヘッダーファイルは`/path/to/include/julia/julia.h`に、ライブラリは`/path/to/lib/libjulia.so`にあると予想されます。`julia`を`PATH`に追加したくない場合は、代わりに`JULIA_DIR`環境変数を設定できます。`JULIA_DIR=/path/to`の場合、ヘッダーとライブラリは前述のパスに存在する必要があります。
 
-The directory that contains `libjulia.so` must be on the library search path. If this is not the case and the library lives at `/path/to/lib/libjulia.so`, you must add `/path/to/lib/` to the `LD_LIBRARY_PATH` environment variable.
+`libjulia.so`を含むディレクトリはライブラリ検索パスに含まれている必要があります。これが満たされていない場合、ライブラリが`/path/to/lib/libjulia.so`にある場合は、`LD_LIBRARY_PATH`環境変数に`/path/to/lib/`を追加する必要があります。
 
 #### Windows
 
-If `julia` is on your `Path` at `X:\path\to\bin\julia.exe`, the main header file is expected to live at `X:\path\to\include\julia\julia.h` and the library at `X:\path\to\bin\libjulia.dll`. You can set the `JULIA_DIR` environment variable instead. If `JULIA_DIR=X:\path\to`, the headers and library must live at the previously mentioned paths.
+`julia`が`X:\path\to\bin\julia.exe`にある場合、メインのヘッダーファイルは`X:\path\to\include\julia\julia.h`に、ライブラリは`X:\path\to\bin\libjulia.dll`にあると予想されます。代わりに`JULIA_DIR`環境変数を設定できます。`JULIA_DIR=X:\path\to`の場合、ヘッダーとライブラリは前述のパスに存在する必要があります。
 
-The directory that contains `libjulia.dll` must be on your `Path` at runtime if Julia is embedded.
+`libjulia.dll`を含むディレクトリは、Juliaが埋め込まれている場合、実行時に`Path`に含まれている必要があります。
 
 #### MacOS
 
-If `julia` is on your `PATH` at `/path/to/bin/julia`, the main header file is expected to live at `/path/to/include/julia/julia.h` and the library at `/path/to/lib/libjulia.dylib`. If you do not want to add `julia` to your `PATH`, you can set the `JULIA_DIR` environment variable instead. If `JULIA_DIR=/path/to`, the headers and library must live at the previously mentioned paths.
+`julia`が`/path/to/bin/julia`にある場合、メインのヘッダーファイルは`/path/to/include/julia/julia.h`に、ライブラリは`/path/to/lib/libjulia.dylib`にあると予想されます。`julia`を`PATH`に追加したくない場合は、代わりに`JULIA_DIR`環境変数を設定できます。`JULIA_DIR=/path/to`の場合、ヘッダーとライブラリは前述のパスに存在する必要があります。
 
-The directory that contains `libjulia.dylib` must be on the library search path. If this is not the case and the library lives at `/path/to/lib/libjulia.dylib`, you must add `/path/to/lib/` to the `DYLD_LIBRARY_PATH` environment variable.
+`libjulia.dylib`を含むディレクトリはライブラリ検索パスに含まれている必要があります。これが満たされていない場合、ライブラリが`/path/to/lib/libjulia.dylib`にある場合は、`DYLD_LIBRARY_PATH`環境変数に`/path/to/lib/`を追加する必要があります。
+
+It seems like you haven't pasted any content yet. Please provide the Markdown content you would like translated, and I'll assist you with the translation.

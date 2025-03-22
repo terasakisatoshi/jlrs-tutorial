@@ -1,8 +1,8 @@
-# Dynamic targets
+# 動的ターゲット
 
-A `GcFrame` is a dynamically-sized alternative for `LocalGcFrame`. With a `GcFrame` we avoid having to count how many slots we'll need.
+`GcFrame` は `LocalGcFrame` の動的サイズ版です。`GcFrame` を使用することで、必要なスロットの数を数える必要がなくなります。
 
-We'll first need to set up a dynamic stack. This is a matter of calling `WithStack::with_stack`, the `WithStack` trait is implemented for `LocalHandle`. Like `LocalGcFrame`, there are two secondary targets which reserve a slot, `Output` and `ReusableSlot`. They behave exactly the same as their local counterparts do.
+まず、動的スタックを設定する必要があります。これは `WithStack::with_stack` を呼び出すことで行います。`WithStack` トレイトは `LocalHandle` に実装されています。`LocalGcFrame` と同様に、スロットを予約する二次的なターゲットとして `Output` と `ReusableSlot` があります。これらはローカルの対応物と全く同じように動作します。
 
 ```rust,ignore
 use jlrs::prelude::*;
@@ -67,8 +67,8 @@ fn main() {
 }
 ```
 
-While a dynamic scope can be nested like a local scope can, this can only be done by calling `GcFrame::scope`. Due to requiring a stack, it's not possible to let an arbitrary target create a new dynamic scope.[^1] Allocating and resizing this stack is relatively expensive, and threading it through our application can be complicated, so it's best to stick with local scopes.
+動的スコープはローカルスコープのようにネストすることができますが、これは `GcFrame::scope` を呼び出すことでのみ可能です。スタックを必要とするため、任意のターゲットが新しい動的スコープを作成することはできません[^1]。このスタックの割り当てとサイズ変更は比較的高価であり、アプリケーション全体に渡すのは複雑になる可能性があるため、ローカルスコープを使用するのが最善です。
 
-There's one more dynamic target: `AsyncGcFrame`. It's a `GcFrame` with some additional async capabilities, we'll take a closer look when the async runtime is introduced.
+もう一つの動的ターゲットとして `AsyncGcFrame` があります。これは追加の非同期機能を持つ `GcFrame` で、非同期ランタイムが導入される際に詳しく見ていきます。
 
-[^1]: Technically it's possible by creating a weak handle, but this is discouraged because setting up the dynamic stack is relatively expensive.
+[^1]: 技術的には弱いハンドルを作成することで可能ですが、動的スタックの設定が比較的高価であるため、これは推奨されません。
